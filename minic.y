@@ -1,7 +1,7 @@
 %{
 #include <stdio.h>
 #include "listaSimbolos.h"
-#include "listaCodigo.h"
+//#include "listaCodigo.h"
 
 Lista tablaSimb;
 int contCadenas=0;
@@ -18,6 +18,10 @@ extern int yylex();
 extern int yylineno;
 %}
 
+%code requires{
+  #include "listaCodigo.h"
+}
+
 //Definimos los tipos que tendrán los tokens
 %union{
 char *cadena;
@@ -27,7 +31,7 @@ ListaC codigo;
 %token VOID VAR CONST IF ELSE WHILE PRINT READ SEMICOLON COMA IGUAL APAR CPAR ACOR CCOR
 //Indicamos el tipo de los tokens
 %token <cadena> CADENA ID NUM
-%type <codigo> expression statement     // aunque no lo ponga en las diapositivas, hay que hacerlo así para poder asignarle al statement un valor de ListaC
+%type <codigo> expression statement    // aunque no lo ponga en las diapositivas, hay que hacerlo así para poder asignarle al statement un valor de ListaC
 //Establecemos la precedencia y la asociatividad (una línea tiene más precedencia que las líneas anteriores)
 %left MAS MENOS
 %left POR DIV
@@ -76,14 +80,14 @@ read_list : ID				{if (!perteneceTablaS($1)) printf("Error en línea %d: variabl
           | read_list COMA ID		{if (!perteneceTablaS($3)) printf("Error en línea %d: variable %s no declarada\n",yylineno,$3); else if (esConstante($3)) printf("Error en línea %d: asignación a constante %s\n",yylineno,$3);}
           ;
 
-expression : expression MAS expression		{$$ = crearLista2($1, $3, "add");}
-           | expression MENOS expression	{$$ = crearLista2($1, $3, "sub");}
-           | expression POR expression		{$$ = crearLista2($1, $3, "mul");}
-           | expression DIV expression		{$$ = crearLista2($1, $3, "div");}
+expression : expression MAS expression	  	{$$ = crearLista2($1, $3, "add");}
+           | expression MENOS expression	  {$$ = crearLista2($1, $3, "sub");}
+           | expression POR expression		  {$$ = crearLista2($1, $3, "mul");}
+           | expression DIV expression		  {$$ = crearLista2($1, $3, "div");}
            | MENOS expression %prec UMENOS	{$$ = crearLista3($2, "neg");}
-           | APAR expression CPAR			{$$ = $2;}	// como la expresion ya es una listaC, no hace falta crear otra listaC
-           | ID								{if (!perteneceTablaS($1)) printf("Error en línea %d: variable %s no declarada\n",yylineno,$1);$$ = crearLista($1, "lw");}
-           | NUM							{$$ = crearLista($1, "li");}
+           | APAR expression CPAR		  	    {$$ = $2;}	// como la expresion ya es una listaC, no hace falta crear otra listaC
+           | ID								              {if (!perteneceTablaS($1)) printf("Error en línea %d: variable %s no declarada\n",yylineno,$1);$$ = crearLista($1, "lw");}
+           | NUM							              {$$ = crearLista($1, "li");}
            ;
 
 %%
@@ -115,7 +119,7 @@ ListaC crearLista(char* arg1, char* op)		// esto vale para id y num, solo cambia
 ListaC crearLista2(ListaC lista, ListaC arg2, char* op) {
   //recuperamos los registros de las expresiones para la operacion
   char* regArg1 = recuperaResLC(lista);
-  char* regArg2 = recuperaResLC(agr2);
+  char* regArg2 = recuperaResLC(arg2);
   //concatena listas
   concatenaLC(lista, arg2);
   //buscamos registros libres
@@ -156,7 +160,7 @@ ListaC crearLista3(ListaC lista, char* op){
   Operacion operacion;
   operacion.op = op;
   operacion.res = registro;
-  operacion.arg1 = regArg1;  
+  operacion.arg1 = regArg;  
   //liberamos registros
   char r = regArg[2];
   int r1 = r - '0';
