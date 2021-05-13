@@ -112,11 +112,12 @@ extern int yylineno;
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 21 "minic.y" /* yacc.c:355  */
+#line 36 "minic.y" /* yacc.c:355  */
 
-  #include "listaCodigo.h"
 
-#line 120 "minic.tab.c" /* yacc.c:355  */
+	#include "listaCodigo.h"
+
+#line 121 "minic.tab.c" /* yacc.c:355  */
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
@@ -154,12 +155,12 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 26 "minic.y" /* yacc.c:355  */
+#line 31 "minic.y" /* yacc.c:355  */
 
 char *cadena;
 ListaC codigo;
 
-#line 163 "minic.tab.c" /* yacc.c:355  */
+#line 164 "minic.tab.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -176,7 +177,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 180 "minic.tab.c" /* yacc.c:358  */
+#line 181 "minic.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -476,10 +477,10 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    42,    42,    42,    45,    45,    46,    46,    47,    50,
-      51,    54,    55,    58,    59,    62,    63,    64,    65,    66,
-      67,    68,    71,    72,    75,    76,    79,    80,    83,    84,
-      85,    86,    87,    88,    89,    90
+       0,    43,    43,    43,    46,    46,    47,    47,    48,    51,
+      52,    55,    56,    59,    60,    63,    64,    65,    66,    67,
+      68,    69,    72,    73,    76,    77,    80,    81,    84,    85,
+      86,    87,    88,    89,    90,    91
 };
 #endif
 
@@ -1298,115 +1299,115 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 42 "minic.y" /* yacc.c:1646  */
+#line 43 "minic.y" /* yacc.c:1646  */
     {tablaSimb=creaLS();}
-#line 1304 "minic.tab.c" /* yacc.c:1646  */
+#line 1305 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 42 "minic.y" /* yacc.c:1646  */
+#line 43 "minic.y" /* yacc.c:1646  */
     {imprimirTablaS(); liberaLS(tablaSimb);}
-#line 1310 "minic.tab.c" /* yacc.c:1646  */
+#line 1311 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 45 "minic.y" /* yacc.c:1646  */
+#line 46 "minic.y" /* yacc.c:1646  */
     {tipo=VARIABLE;}
-#line 1316 "minic.tab.c" /* yacc.c:1646  */
+#line 1317 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 46 "minic.y" /* yacc.c:1646  */
+#line 47 "minic.y" /* yacc.c:1646  */
     {tipo=CONSTANTE;}
-#line 1322 "minic.tab.c" /* yacc.c:1646  */
+#line 1323 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 54 "minic.y" /* yacc.c:1646  */
+#line 55 "minic.y" /* yacc.c:1646  */
     {if (!perteneceTablaS((yyvsp[0].cadena))) anadeEntrada((yyvsp[0].cadena),tipo); else printf("Error en línea %d: variable %s ya declarada\n",yylineno,(yyvsp[0].cadena));}
-#line 1328 "minic.tab.c" /* yacc.c:1646  */
+#line 1329 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 55 "minic.y" /* yacc.c:1646  */
+#line 56 "minic.y" /* yacc.c:1646  */
     {if (!perteneceTablaS((yyvsp[-2].cadena))) anadeEntrada((yyvsp[-2].cadena),tipo); else printf("Error en línea %d: variable %s ya declarada\n",yylineno,(yyvsp[-2].cadena));}
-#line 1334 "minic.tab.c" /* yacc.c:1646  */
+#line 1335 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 62 "minic.y" /* yacc.c:1646  */
+#line 63 "minic.y" /* yacc.c:1646  */
     {if (!perteneceTablaS((yyvsp[-3].cadena))) printf("Error en línea %d: variable %s no declarada\n",yylineno,(yyvsp[-3].cadena)); else if (esConstante((yyvsp[-3].cadena))) printf("Error en línea %d: asignación a constante %s\n",yylineno,(yyvsp[-3].cadena)); (yyval.codigo) = crearLista3((yyvsp[-1].codigo), "sw");}
-#line 1340 "minic.tab.c" /* yacc.c:1646  */
+#line 1341 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 76 "minic.y" /* yacc.c:1646  */
+#line 77 "minic.y" /* yacc.c:1646  */
     {anadeEntrada((yyvsp[0].cadena),STRING);contCadenas++;}
-#line 1346 "minic.tab.c" /* yacc.c:1646  */
+#line 1347 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 79 "minic.y" /* yacc.c:1646  */
+#line 80 "minic.y" /* yacc.c:1646  */
     {if (!perteneceTablaS((yyvsp[0].cadena))) printf("Error en línea %d: variable %s no declarada\n",yylineno,(yyvsp[0].cadena)); else if (esConstante((yyvsp[0].cadena))) printf("Error en línea %d: asignación a constante %s\n",yylineno,(yyvsp[0].cadena));}
-#line 1352 "minic.tab.c" /* yacc.c:1646  */
+#line 1353 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 80 "minic.y" /* yacc.c:1646  */
+#line 81 "minic.y" /* yacc.c:1646  */
     {if (!perteneceTablaS((yyvsp[0].cadena))) printf("Error en línea %d: variable %s no declarada\n",yylineno,(yyvsp[0].cadena)); else if (esConstante((yyvsp[0].cadena))) printf("Error en línea %d: asignación a constante %s\n",yylineno,(yyvsp[0].cadena));}
-#line 1358 "minic.tab.c" /* yacc.c:1646  */
+#line 1359 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 83 "minic.y" /* yacc.c:1646  */
+#line 84 "minic.y" /* yacc.c:1646  */
     {(yyval.codigo) = crearLista2((yyvsp[-2].codigo), (yyvsp[0].codigo), "add");}
-#line 1364 "minic.tab.c" /* yacc.c:1646  */
+#line 1365 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 84 "minic.y" /* yacc.c:1646  */
+#line 85 "minic.y" /* yacc.c:1646  */
     {(yyval.codigo) = crearLista2((yyvsp[-2].codigo), (yyvsp[0].codigo), "sub");}
-#line 1370 "minic.tab.c" /* yacc.c:1646  */
+#line 1371 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 85 "minic.y" /* yacc.c:1646  */
+#line 86 "minic.y" /* yacc.c:1646  */
     {(yyval.codigo) = crearLista2((yyvsp[-2].codigo), (yyvsp[0].codigo), "mul");}
-#line 1376 "minic.tab.c" /* yacc.c:1646  */
+#line 1377 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 86 "minic.y" /* yacc.c:1646  */
+#line 87 "minic.y" /* yacc.c:1646  */
     {(yyval.codigo) = crearLista2((yyvsp[-2].codigo), (yyvsp[0].codigo), "div");}
-#line 1382 "minic.tab.c" /* yacc.c:1646  */
+#line 1383 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 87 "minic.y" /* yacc.c:1646  */
+#line 88 "minic.y" /* yacc.c:1646  */
     {(yyval.codigo) = crearLista3((yyvsp[0].codigo), "neg");}
-#line 1388 "minic.tab.c" /* yacc.c:1646  */
+#line 1389 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 88 "minic.y" /* yacc.c:1646  */
+#line 89 "minic.y" /* yacc.c:1646  */
     {(yyval.codigo) = (yyvsp[-1].codigo);}
-#line 1394 "minic.tab.c" /* yacc.c:1646  */
+#line 1395 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 89 "minic.y" /* yacc.c:1646  */
+#line 90 "minic.y" /* yacc.c:1646  */
     {if (!perteneceTablaS((yyvsp[0].cadena))) printf("Error en línea %d: variable %s no declarada\n",yylineno,(yyvsp[0].cadena));(yyval.codigo) = crearLista((yyvsp[0].cadena), "lw");}
-#line 1400 "minic.tab.c" /* yacc.c:1646  */
+#line 1401 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 90 "minic.y" /* yacc.c:1646  */
+#line 91 "minic.y" /* yacc.c:1646  */
     {(yyval.codigo) = crearLista((yyvsp[0].cadena), "li");}
-#line 1406 "minic.tab.c" /* yacc.c:1646  */
+#line 1407 "minic.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1410 "minic.tab.c" /* yacc.c:1646  */
+#line 1411 "minic.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1634,7 +1635,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 93 "minic.y" /* yacc.c:1906  */
+#line 94 "minic.y" /* yacc.c:1906  */
 
 
 void yyerror()

@@ -18,16 +18,6 @@ extern int yylex();
 extern int yylineno;
 %}
 
-%code requires{
-  #include "listaCodigo.h"
-}
-
-//Definimos los tipos que tendrán los tokens
-%union{
-char *cadena;
-ListaC codigo;
-}
-
 %token VOID VAR CONST IF ELSE WHILE PRINT READ SEMICOLON COMA IGUAL APAR CPAR ACOR CCOR
 //Indicamos el tipo de los tokens
 %token <cadena> CADENA ID NUM
@@ -36,6 +26,17 @@ ListaC codigo;
 %left MAS MENOS
 %left POR DIV
 %left UMENOS
+
+//Definimos los tipos que tendrán los tokens
+%union{
+char *cadena;
+ListaC codigo;
+}
+
+%code requires{
+
+	#include "listaCodigo.h"
+}
 
 %%
 

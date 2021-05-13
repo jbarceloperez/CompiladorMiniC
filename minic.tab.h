@@ -40,11 +40,12 @@
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 21 "minic.y" /* yacc.c:1909  */
+#line 36 "minic.y" /* yacc.c:1909  */
 
-  #include "listaCodigo.h"
 
-#line 48 "minic.tab.h" /* yacc.c:1909  */
+	#include "listaCodigo.h"
+
+#line 49 "minic.tab.h" /* yacc.c:1909  */
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
@@ -82,12 +83,12 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 26 "minic.y" /* yacc.c:1909  */
+#line 31 "minic.y" /* yacc.c:1909  */
 
 char *cadena;
 ListaC codigo;
 
-#line 91 "minic.tab.h" /* yacc.c:1909  */
+#line 92 "minic.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
