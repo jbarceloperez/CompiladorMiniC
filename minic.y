@@ -31,7 +31,7 @@ ListaC codigo;
 %token VOID VAR CONST IF ELSE WHILE PRINT READ SEMICOLON COMA IGUAL APAR CPAR ACOR CCOR
 //Indicamos el tipo de los tokens
 %token <cadena> CADENA ID NUM
-%type <codigo> expression statement    // aunque no lo ponga en las diapositivas, hay que hacerlo así para poder asignarle al statement un valor de ListaC
+%type <codigo> expression statement statement_list print_item print_list read_list program declarations      // aunque no lo ponga en las diapositivas, hay que hacerlo así para poder asignarle al statement un valor de ListaC
 //Establecemos la precedencia y la asociatividad (una línea tiene más precedencia que las líneas anteriores)
 %left MAS MENOS
 %left POR DIV
