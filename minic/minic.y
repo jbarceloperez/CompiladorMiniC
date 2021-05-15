@@ -1,7 +1,7 @@
 %{
 #include <stdio.h>
 #include "listaSimbolos.h"
-//#include "listaCodigo.h"
+#include "listaCodigo.h"
 
 Lista tablaSimb;
 int contCadenas=0;
@@ -11,12 +11,23 @@ void anadeEntrada(char *lexema, Tipo tipo);
 int esConstante(char *lexema);
 void imprimirTablaS();
 
+int buscarReg();
+ListaC crearLista(char* arg1, char* op);
+ListaC crearLista2(ListaC lista, ListaC arg2, char* op);
+ListaC crearLista3(ListaC lista, char* op);
+
 int registros[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 void yyerror();
 extern int yylex();
 extern int yylineno;
 %}
+
+//Definimos los tipos que tendrán los tokens
+%union{
+char *cadena;
+ListaC codigo;
+}
 
 %token VOID VAR CONST IF ELSE WHILE PRINT READ SEMICOLON COMA IGUAL APAR CPAR ACOR CCOR
 //Indicamos el tipo de los tokens
@@ -26,17 +37,6 @@ extern int yylineno;
 %left MAS MENOS
 %left POR DIV
 %left UMENOS
-
-//Definimos los tipos que tendrán los tokens
-%union{
-char *cadena;
-ListaC codigo;
-}
-
-%code requires{
-
-	#include "listaCodigo.h"
-}
 
 %%
 

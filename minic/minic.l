@@ -1,7 +1,7 @@
 %{
-#include "minic.tab.h"
 #include "listaSimbolos.h"
-//#include "listaCodigo.h"
+#include "listaCodigo.h"
+#include "minic.tab.h"
 
 void error_lexico();
 void error_comentario();
