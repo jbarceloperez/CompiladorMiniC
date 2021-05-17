@@ -520,9 +520,9 @@ static int yy_more_len = 0;
 char *yytext;
 #line 1 "minic.l"
 #line 2 "minic.l"
-#include "minic.tab.h"
 #include "listaSimbolos.h"
-//#include "listaCodigo.h"
+#include "listaCodigo.h"
+#include "minic.tab.h"
 
 void error_lexico();
 void error_comentario();
