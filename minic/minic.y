@@ -124,6 +124,7 @@ ListaC crearLista2(ListaC lista, ListaC arg2, char* op) {
   char* regArg2 = recuperaResLC(arg2);
   //concatena listas
   concatenaLC(lista, arg2);
+  liberaLC(arg2);
   //buscamos registros libres
   int reg = buscarReg();
   registros[reg] = 1;
@@ -174,21 +175,37 @@ ListaC crearLista3(ListaC lista, char* op){
 }
 
 ListaC listaIf(ListaC cond, ListaC st) {
-  //recuperamos los registros de las expresiones
+      //recuperamos los registros de las expresiones
   char* regCond = recuperaResLC(cond);
   char* regSt = recuperaResLC(st);
-  //creamos la etiqueta del salto
+      //creamos la etiqueta del salto
   char* tag;
   sprintf(tag, "ET%d", tag_counter);
   tag_counter++;
-  //añade beqz
-  PosicionListaC final = finalLC(lista);
+      //añade beqz
+  PosicionListaC final = finalLC(cond);
   Operacion operacion;
   Operacion.op = "beqz";
   operacion.res = regCond;
-  operacion.arg1 = ;
-
-
+  operacion.arg1 = tag;
+      //liberamos registros ¿se libera el regCond que decide el salto? ¿qué hacemos con el registro res de la lista cond? ¿con cual nos quedamos?
+  char r = regCond[2];
+  int r1 = r - '0';
+  registros[r1] = 0;
+      // insertar la op
+  insertaLC(cond, final, operacion);
+      //concatena listas
+  concatenaLC(cond, st);
+  liberaLC(st); 
+  guardaResLC(cond, regSt);
+      //insertar etiqueta
+  final = finalLC(cond);
+  Operacion etiqueta;
+  char* etq;
+  sprintf(etq, "%s:", tag);
+  etiqueta.op = etq;
+  insertaLC(cond, final, etiqueta);
+  return cond;
 }
 
 int buscarReg()
