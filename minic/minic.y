@@ -217,8 +217,15 @@ ListaC listaPrintItem(int cadena) {
   op_la.op = "la";
   op_la.res = "$a0";
   op_la.arg1 = str;
-  
-
+  PosicionListaC final = finalLC(lista);
+  insertaLC(lista, final, op_la);
+  // li $v0, 4
+  Operacion op_li;
+  op_la.op = "li";
+  op_la.res = "$v0";
+  op_la.arg1 = "4";
+  final = finalLC(lista);
+  insertaLC(lista, final, op_la);
 
 
 
