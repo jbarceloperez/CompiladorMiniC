@@ -17,6 +17,7 @@ ListaC crearLista2(ListaC lista, ListaC arg2, char* op);
 ListaC crearLista3(ListaC lista, char* op);
 
 int registros[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+int tag_counter = 0;
 
 void yyerror();
 extern int yylex();
@@ -60,10 +61,10 @@ statement_list : statement_list statement
                | /*empty*/
                ;
 
-statement : ID IGUAL expression SEMICOLON			{if (!perteneceTablaS($1)) printf("Error en línea %d: variable %s no declarada\n",yylineno,$1); else if (esConstante($1)) printf("Error en línea %d: asignación a constante %s\n",yylineno,$1); $$ = crearLista3($3, "sw");}
+statement : ID IGUAL expression SEMICOLON			  {if (!perteneceTablaS($1)) printf("Error en línea %d: variable %s no declarada\n",yylineno,$1); else if (esConstante($1)) printf("Error en línea %d: asignación a constante %s\n",yylineno,$1); $$ = crearLista3($3, "sw");}
           | ACOR statement_list CCOR
           | IF APAR expression CPAR statement ELSE statement
-          | IF APAR expression CPAR statement
+          | IF APAR expression CPAR statement   {$$ = listaIf($3, $5)}
           | WHILE APAR expression CPAR statement
           | PRINT print_list SEMICOLON
           | READ read_list SEMICOLON
@@ -170,6 +171,24 @@ ListaC crearLista3(ListaC lista, char* op){
   insertaLC(lista, final, operacion);
   guardaResLC(lista, registro);
   return lista;    
+}
+
+ListaC listaIf(ListaC cond, ListaC st) {
+  //recuperamos los registros de las expresiones
+  char* regCond = recuperaResLC(cond);
+  char* regSt = recuperaResLC(st);
+  //creamos la etiqueta del salto
+  char* tag;
+  sprintf(tag, "ET%d", tag_counter);
+  tag_counter++;
+  //añade beqz
+  PosicionListaC final = finalLC(lista);
+  Operacion operacion;
+  Operacion.op = "beqz";
+  operacion.res = regCond;
+  operacion.arg1 = ;
+
+
 }
 
 int buscarReg()
