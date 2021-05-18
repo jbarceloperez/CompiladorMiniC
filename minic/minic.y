@@ -212,7 +212,12 @@ ListaC listaPrintItem(int cadena) {
   ListaC lista = creaLC();
   char* str;
   sprintf(str, "$str%d", cadena);
-
+  // la $a0, $strX
+  Operacion op_la;
+  op_la.op = "la";
+  op_la.res = "$a0";
+  op_la.arg1 = str;
+  
 
 
 
