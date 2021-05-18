@@ -15,6 +15,8 @@ int buscarReg();
 ListaC crearLista(char* arg1, char* op);
 ListaC crearLista2(ListaC lista, ListaC arg2, char* op);
 ListaC crearLista3(ListaC lista, char* op);
+ListaC listaIf(ListaC cond, ListaC st);
+ListaC listaPrintItem(int cadena);
 
 int registros[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int tag_counter = 0;
@@ -64,13 +66,13 @@ statement_list : statement_list statement
 statement : ID IGUAL expression SEMICOLON			  {if (!perteneceTablaS($1)) printf("Error en línea %d: variable %s no declarada\n",yylineno,$1); else if (esConstante($1)) printf("Error en línea %d: asignación a constante %s\n",yylineno,$1); $$ = crearLista3($3, "sw");}
           | ACOR statement_list CCOR
           | IF APAR expression CPAR statement ELSE statement
-          | IF APAR expression CPAR statement   {$$ = listaIf($3, $5)}
+          | IF APAR expression CPAR statement   {$$ = listaIf($3, $5);}
           | WHILE APAR expression CPAR statement
-          | PRINT print_list SEMICOLON          {$$ = $2}
+          | PRINT print_list SEMICOLON          {$$ = $2;}
           | READ read_list SEMICOLON
           ;
 
-print_list : print_item                         {$$ = $1}
+print_list : print_item                         {$$ = $1;}
            | print_list COMA print_item
            ;
 
@@ -185,7 +187,7 @@ ListaC listaIf(ListaC cond, ListaC st) {
       //añade beqz
   PosicionListaC final = finalLC(cond);
   Operacion operacion;
-  Operacion.op = "beqz";
+  operacion.op = "beqz";
   operacion.res = regCond;
   operacion.arg1 = tag;
       //liberamos registros ¿se libera el regCond que decide el salto? ¿qué hacemos con el registro res de la lista cond? ¿con cual nos quedamos?
