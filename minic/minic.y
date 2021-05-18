@@ -66,11 +66,11 @@ statement : ID IGUAL expression SEMICOLON			  {if (!perteneceTablaS($1)) printf(
           | IF APAR expression CPAR statement ELSE statement
           | IF APAR expression CPAR statement   {$$ = listaIf($3, $5)}
           | WHILE APAR expression CPAR statement
-          | PRINT print_list SEMICOLON
+          | PRINT print_list SEMICOLON          {$$ = $2}
           | READ read_list SEMICOLON
           ;
 
-print_list : print_item
+print_list : print_item                         {$$ = $1}
            | print_list COMA print_item
            ;
 
@@ -226,10 +226,10 @@ ListaC listaPrintItem(int cadena) {
   op_la.arg1 = "4";
   final = finalLC(lista);
   insertaLC(lista, final, op_la);
-
-
-
-
+  Operacion syscall;
+  syscall.op = "syscall";
+  final = finalLC(lista);
+  insertaLC(lista, final, op_la);
   return lista; 
 }
 
