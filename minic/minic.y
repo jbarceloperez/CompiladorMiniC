@@ -75,7 +75,7 @@ print_list : print_item
            ;
 
 print_item : expression
-           | CADENA		{anadeEntrada($1,STRING);contCadenas++;}
+           | CADENA		{anadeEntrada($1,STRING); $$ = listaPrintItem(contCadenas); contCadenas++;}
            ;
 
 read_list : ID				{if (!perteneceTablaS($1)) printf("Error en línea %d: variable %s no declarada\n",yylineno,$1); else if (esConstante($1)) printf("Error en línea %d: asignación a constante %s\n",yylineno,$1);}
@@ -206,6 +206,19 @@ ListaC listaIf(ListaC cond, ListaC st) {
   etiqueta.op = etq;
   insertaLC(cond, final, etiqueta);
   return cond;
+}
+
+ListaC listaPrintItem(int cadena) {
+  ListaC lista = creaLC();
+  char* str;
+  sprintf(str, "$str%d", cadena);
+
+
+
+
+
+
+  return lista; 
 }
 
 int buscarReg()
