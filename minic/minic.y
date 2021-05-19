@@ -17,6 +17,8 @@ ListaC crearLista2(ListaC lista, ListaC arg2, char* op);
 ListaC crearLista3(ListaC lista, char* op);
 ListaC listaIf(ListaC cond, ListaC st);
 ListaC listaPrintItem(int cadena);
+ListaC listaPrintExpresion(ListaC arg);
+ListaC concatena(ListaC l1, ListaC l2);
 
 int registros[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int tag_counter = 0;
@@ -73,11 +75,11 @@ statement : ID IGUAL expression SEMICOLON			  {if (!perteneceTablaS($1)) printf(
           ;
 
 print_list : print_item                         {$$ = $1;}
-           | print_list COMA print_item
+           | print_list COMA print_item         {$$ = concatena($1, $3);}
            ;
 
-print_item : expression
-           | CADENA		{anadeEntrada($1,STRING); $$ = listaPrintItem(contCadenas); contCadenas++;}
+print_item : expression              {$$ = listaPrintExpresion($1);}
+           | CADENA		               {anadeEntrada($1,STRING); $$ = listaPrintItem(contCadenas); contCadenas++;}
            ;
 
 read_list : ID				{if (!perteneceTablaS($1)) printf("Error en línea %d: variable %s no declarada\n",yylineno,$1); else if (esConstante($1)) printf("Error en línea %d: asignación a constante %s\n",yylineno,$1);}
@@ -235,16 +237,49 @@ ListaC listaPrintItem(int cadena) {
   insertaLC(lista, final, op_la);
   // li $v0, 4
   Operacion op_li;
-  op_la.op = "li";
-  op_la.res = "$v0";
-  op_la.arg1 = "4";
+  op_li.op = "li";
+  op_li.res = "$v0";
+  op_li.arg1 = "4";
   final = finalLC(lista);
-  insertaLC(lista, final, op_la);
+  insertaLC(lista, final, op_li);
   Operacion syscall;
   syscall.op = "syscall";
   final = finalLC(lista);
-  insertaLC(lista, final, op_la);
+  insertaLC(lista, final, syscall);
   return lista; 
+}
+
+ListaC listaPrintExpresion(ListaC lista) {
+  char* regLista = recuperaResLC(lista);
+  //move $a0, $tX
+  Operacion op_move;
+  op_move.op = "move";
+  op_move.res = "$a0";
+  op_move.arg1 = regLista;
+  // se libera el registro
+  char r = regLista[2];
+  int r1 = r - '0';
+  registros[r1] = 0;
+  PosicionListaC final = finalLC(lista);
+  insertaLC(lista, final, op_move);
+  // li $v0, 1
+  Operacion op_li;
+  op_li.op = "li";
+  op_li.res = "$v0";
+  op_li.arg1 = "1";
+  final = finalLC(lista);
+  insertaLC(lista, final, op_li);
+  Operacion syscall;
+  syscall.op = "syscall";
+  final = finalLC(lista);
+  insertaLC(lista, final, syscall);
+  return lista;
+}
+
+ListaC concatena(ListaC l1, ListaC l2){
+  concatenaLC(l1, l2);
+  liberaLC(l2);
+  return l1;
 }
 
 int buscarReg()
