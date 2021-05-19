@@ -1664,24 +1664,30 @@ void yyerror()
 
 ListaC crearLista(char* arg1, char* op)		// esto vale para id y num, solo cambia el tipo de op (li o lw)
 {
+  printf("crearLista\n");
   ListaC lista = creaLC();
   int reg = buscarReg();
+  printf("reg=%d\n",reg);
   registros[reg] = 1;
-  char* registro;
+  char registro[3];
   sprintf(registro, "$t%d", reg);
+  printf("%s\n",registro);
   PosicionListaC inicio = inicioLC(lista);
   //Creamos la operación
   Operacion operacion;
   operacion.op = op;
   operacion.res = registro;
   operacion.arg1 = arg1;
+  printf("1\n");
   //Insertamos la operación en la lista
   insertaLC(lista, inicio, operacion);
   guardaResLC(lista, registro);
+  printf("0\n");
   return lista;
 }
 
 ListaC crearLista2(ListaC lista, ListaC arg2, char* op) {
+  printf("crearLista2\n");
   //recuperamos los registros de las expresiones para la operacion
   char* regArg1 = recuperaResLC(lista);
   char* regArg2 = recuperaResLC(arg2);
@@ -1714,6 +1720,7 @@ ListaC crearLista2(ListaC lista, ListaC arg2, char* op) {
 }
 
 ListaC crearLista3(ListaC lista, char* op){
+  printf("crearLista3\n");
   //recuperamos los registros de las expresiones para la operacion
   char* regArg = recuperaResLC(lista);
   //buscamos registros libres
@@ -1738,6 +1745,7 @@ ListaC crearLista3(ListaC lista, char* op){
 }
 
 ListaC listaIf(ListaC cond, ListaC st) {
+  printf("listaIf\n");
       //recuperamos los registros de las expresiones
   char* regCond = recuperaResLC(cond);
   char* regSt = recuperaResLC(st);
@@ -1772,6 +1780,7 @@ ListaC listaIf(ListaC cond, ListaC st) {
 }
 
 ListaC listaPrintItem(int cadena) {
+  printf("listaPrintItem\n");
   ListaC lista = creaLC();
   char* str;
   sprintf(str, "$str%d", cadena);
