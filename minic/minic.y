@@ -84,7 +84,7 @@ print_item : expression              {$$ = listaPrintExpresion($1);}
            ;
 
 read_list : ID				              {if (!perteneceTablaS($1)) printf("Error en línea %d: variable %s no declarada\n",yylineno,$1); else if (esConstante($1)) printf("Error en línea %d: asignación a constante %s\n",yylineno,$1); $$ = listaRead($1);}
-          | read_list COMA ID		    {if (!perteneceTablaS($3)) printf("Error en línea %d: variable %s no declarada\n",yylineno,$3); else if (esConstante($3)) printf("Error en línea %d: asignación a constante %s\n",yylineno,$3);}
+          | read_list COMA ID		    {if (!perteneceTablaS($3)) printf("Error en línea %d: variable %s no declarada\n",yylineno,$3); else if (esConstante($3)) printf("Error en línea %d: asignación a constante %s\n",yylineno,$3); $$ = concatena($1, listaRead($3));}
           ;
 
 expression : expression MAS expression	  	{$$ = crearLista2($1, $3, "add");}

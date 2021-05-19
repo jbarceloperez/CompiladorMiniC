@@ -1394,7 +1394,7 @@ yyreduce:
 
   case 27:
 #line 87 "minic.y" /* yacc.c:1646  */
-    {if (!perteneceTablaS((yyvsp[0].cadena))) printf("Error en línea %d: variable %s no declarada\n",yylineno,(yyvsp[0].cadena)); else if (esConstante((yyvsp[0].cadena))) printf("Error en línea %d: asignación a constante %s\n",yylineno,(yyvsp[0].cadena));}
+    {if (!perteneceTablaS((yyvsp[0].cadena))) printf("Error en línea %d: variable %s no declarada\n",yylineno,(yyvsp[0].cadena)); else if (esConstante((yyvsp[0].cadena))) printf("Error en línea %d: asignación a constante %s\n",yylineno,(yyvsp[0].cadena)); (yyval.codigo) = concatena((yyvsp[-2].codigo), listaRead((yyvsp[0].cadena)));}
 #line 1399 "minic.tab.c" /* yacc.c:1646  */
     break;
 
@@ -1866,7 +1866,7 @@ ListaC concatena(ListaC l1, ListaC l2){
 
 ListaC listaRead(char* cadena){
   printf("listaRead\n");           //debug
-  printf("%s\n", cadena);
+  printf("%s\n", cadena);          //debug
   ListaC lista = creaLC();
   // li $v0, 5
   Operacion op_li;
