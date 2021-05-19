@@ -19,6 +19,7 @@ ListaC listaIf(ListaC cond, ListaC st);
 ListaC listaPrintItem(int cadena);
 ListaC listaPrintExpresion(ListaC arg);
 ListaC concatena(ListaC l1, ListaC l2);
+ListaC listaRead(char* cadena);
 
 int registros[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int tag_counter = 0;
@@ -57,8 +58,8 @@ identifier_list : asig
                 | identifier_list COMA asig
                 ;
 
-asig : ID			{if (!perteneceTablaS($1)) anadeEntrada($1,tipo); else printf("Error en línea %d: variable %s ya declarada\n",yylineno,$1);}
-     | ID IGUAL expression	{if (!perteneceTablaS($1)) anadeEntrada($1,tipo); else printf("Error en línea %d: variable %s ya declarada\n",yylineno,$1);}
+asig : ID			                  {if (!perteneceTablaS($1)) anadeEntrada($1,tipo); else printf("Error en línea %d: variable %s ya declarada\n",yylineno,$1);}
+     | ID IGUAL expression	    {if (!perteneceTablaS($1)) anadeEntrada($1,tipo); else printf("Error en línea %d: variable %s ya declarada\n",yylineno,$1);}
      ;
 
 statement_list : statement_list statement
@@ -71,7 +72,7 @@ statement : ID IGUAL expression SEMICOLON			  {if (!perteneceTablaS($1)) printf(
           | IF APAR expression CPAR statement   {$$ = listaIf($3, $5);}
           | WHILE APAR expression CPAR statement
           | PRINT print_list SEMICOLON          {$$ = $2;}
-          | READ read_list SEMICOLON
+          | READ read_list SEMICOLON            {$$ = $2;}
           ;
 
 print_list : print_item                         {$$ = $1;}
@@ -82,8 +83,8 @@ print_item : expression              {$$ = listaPrintExpresion($1);}
            | CADENA		               {anadeEntrada($1,STRING); $$ = listaPrintItem(contCadenas); contCadenas++;}
            ;
 
-read_list : ID				{if (!perteneceTablaS($1)) printf("Error en línea %d: variable %s no declarada\n",yylineno,$1); else if (esConstante($1)) printf("Error en línea %d: asignación a constante %s\n",yylineno,$1);}
-          | read_list COMA ID		{if (!perteneceTablaS($3)) printf("Error en línea %d: variable %s no declarada\n",yylineno,$3); else if (esConstante($3)) printf("Error en línea %d: asignación a constante %s\n",yylineno,$3);}
+read_list : ID				              {if (!perteneceTablaS($1)) printf("Error en línea %d: variable %s no declarada\n",yylineno,$1); else if (esConstante($1)) printf("Error en línea %d: asignación a constante %s\n",yylineno,$1); $$ = listaRead($1);}
+          | read_list COMA ID		    {if (!perteneceTablaS($3)) printf("Error en línea %d: variable %s no declarada\n",yylineno,$3); else if (esConstante($3)) printf("Error en línea %d: asignación a constante %s\n",yylineno,$3);}
           ;
 
 expression : expression MAS expression	  	{$$ = crearLista2($1, $3, "add");}
@@ -280,6 +281,32 @@ ListaC concatena(ListaC l1, ListaC l2){
   concatenaLC(l1, l2);
   liberaLC(l2);
   return l1;
+}
+
+ListaC listaRead(char* cadena){
+  ListaC lista = creaLC();
+  // li $v0, 5
+  Operacion op_li;
+  op_li.op = "li";
+  op_li.res = "$v0";
+  op_li.arg1 = "5";
+  PosicionListaC final = finalLC(lista);
+  insertaLC(lista, final, op_li);
+  Operacion syscall;
+  syscall.op = "syscall";
+  final = finalLC(lista);
+  insertaLC(lista, final, syscall);
+  // sw $v0, _X
+  Operacion op_sw;
+  op_sw.op = "sw";
+  op_sw.res = "$v0";
+  char arg[16];
+  sprintf(arg, "_%s", cadena);
+  printf("%s", arg);                      //debug
+  op_sw.arg1 = arg;
+  final = finalLC(lista);
+  insertaLC(lista, final, op_sw); 
+  return lista;
 }
 
 int buscarReg()
