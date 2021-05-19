@@ -251,6 +251,7 @@ ListaC listaPrintItem(int cadena) {
 }
 
 ListaC listaPrintExpresion(ListaC lista) {
+  printf("listaPrintExpresion\n");           //debug
   char* regLista = recuperaResLC(lista);
   //move $a0, $tX
   Operacion op_move;
@@ -278,12 +279,15 @@ ListaC listaPrintExpresion(ListaC lista) {
 }
 
 ListaC concatena(ListaC l1, ListaC l2){
+  printf("concatena\n");           //debug
   concatenaLC(l1, l2);
   liberaLC(l2);
   return l1;
 }
 
 ListaC listaRead(char* cadena){
+  printf("listaRead\n");           //debug
+  printf("%s\n", cadena);          //debug
   ListaC lista = creaLC();
   // li $v0, 5
   Operacion op_li;
@@ -302,7 +306,7 @@ ListaC listaRead(char* cadena){
   op_sw.res = "$v0";
   char arg[16];
   sprintf(arg, "_%s", cadena);
-  printf("%s", arg);                      //debug
+  printf("%s\n", arg);                      //debug
   op_sw.arg1 = arg;
   final = finalLC(lista);
   insertaLC(lista, final, op_sw); 

@@ -76,7 +76,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 32 "minic.y" /* yacc.c:1909  */
+#line 33 "minic.y" /* yacc.c:1909  */
 
 char *cadena;
 ListaC codigo;
