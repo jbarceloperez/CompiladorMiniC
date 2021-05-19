@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <stdio.h>
+
 
 struct PosicionListaCRep {
   Operacion dato;
@@ -113,4 +115,19 @@ void guardaResLC(ListaC codigo, char *res) {
 /* Recupera el registro resultado de una lista de codigo */
 char * recuperaResLC(ListaC codigo) {
   return codigo->res;
+}
+
+void debugLista(ListaC lista){
+  PosicionListaC aux = inicioLC(lista);
+  int n = longitudLC(lista);
+  printf("Info de lista:\n Longitud:%d\n",n);
+  int cont=0;
+  while(aux->sig!=NULL){
+    printf("[%d]\t%s\t%s,%s", cont, aux->sig->dato.op, aux->sig->dato.res, aux->sig->dato.arg1);
+    if (aux->sig->dato.arg2!=NULL) printf(",%s\n",aux->sig->dato.arg2);
+    else printf("\n");
+    cont++; 
+    aux = aux->sig;
+  }
+
 }

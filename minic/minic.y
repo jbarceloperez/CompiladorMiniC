@@ -1,6 +1,7 @@
 %{
 #include <stdio.h>
 #include "listaSimbolos.h"
+// #include "listaCodigo.c"
 #include "listaCodigo.h"
 
 Lista tablaSimb;
@@ -135,8 +136,8 @@ ListaC crearLista(char* arg1, char* op)		// esto vale para id y num, solo cambia
 
 ListaC crearLista2(ListaC lista, ListaC arg2, char* op) {
   printf("crearLista2 %s\n", op);                 //debug
-  printf("Long1:%d,Long2:%d\n",longitudLC(lista), longitudLC(arg2));      //debug
-  printf("1:%s,2:%s\n",recuperaLC(lista,inicioLC(lista)).res, recuperaLC(arg2,inicioLC(arg2)).res);      //debug
+  debugLista(lista);
+  debugLista(arg2);
   //recuperamos los registros de las expresiones para la operacion
   char* regArg1 = recuperaResLC(lista);
   char* regArg2 = recuperaResLC(arg2);
@@ -145,13 +146,7 @@ ListaC crearLista2(ListaC lista, ListaC arg2, char* op) {
   concatenaLC(lista, arg2);
   liberaLC(arg2);
   printf("Long1:%d\n",longitudLC(lista));      //debug
-
-//////////////////////////////////////////////////////////////////
-  Operacion op1=recuperaLC(lista,inicioLC(lista));
-  Operacion op2=recuperaLC(lista,siguienteLC(lista,inicioLC(lista)));
-  printf("[1]: %s\t%s,%s,%s\n",op1.op, op1.res, op1.arg1, op1.arg2);   //debug
-  printf("[2]: %s\t%s,%s,%s\n",op2.op, op2.res, op2.arg1, op2.arg2);   //debug
-////////////////////////////////////////////////////////////////// 
+  debugLista(lista);
 
   //buscamos registros libres
   int reg = buscarReg();
@@ -180,7 +175,6 @@ ListaC crearLista2(ListaC lista, ListaC arg2, char* op) {
   insertaLC(lista, final, operacion);
   guardaResLC(lista, registro);
   int i;  for (i=0;i<10;i++) printf("[%d]", registros[i]); printf("\n");    //debug
-
   return lista;
 }
 

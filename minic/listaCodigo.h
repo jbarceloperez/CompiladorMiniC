@@ -47,5 +47,7 @@ PosicionListaC siguienteLC(ListaC codigo, PosicionListaC p);
 void guardaResLC(ListaC codigo, char *res);
 /* Recupera el registro resultado de una lista de código */
 char * recuperaResLC(ListaC codigo);
+/* Imprime la info de una lista*/
+void debugLista(ListaC lista);
 
 #endif
