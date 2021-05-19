@@ -106,27 +106,27 @@ ListaC crearLista(char* arg1, char* op)		// esto vale para id y num, solo cambia
   printf("crearLista\n");
   ListaC lista = creaLC();
   int reg = buscarReg();
-  printf("reg=%d\n",reg);
+  printf("reg=%d\n",reg);                 //debug
   registros[reg] = 1;
-  char registro[3];
+  char registro[4];
   sprintf(registro, "$t%d", reg);
-  printf("%s\n",registro);
+  printf("%s\n",registro);                 //debug
   PosicionListaC inicio = inicioLC(lista);
   //Creamos la operación
   Operacion operacion;
   operacion.op = op;
   operacion.res = registro;
   operacion.arg1 = arg1;
-  printf("1\n");
+  printf("1\n");                 //debug
   //Insertamos la operación en la lista
   insertaLC(lista, inicio, operacion);
   guardaResLC(lista, registro);
-  printf("0\n");
+  printf("0\n");                 //debug
   return lista;
 }
 
 ListaC crearLista2(ListaC lista, ListaC arg2, char* op) {
-  printf("crearLista2\n");
+  printf("crearLista2\n");                 //debug
   //recuperamos los registros de las expresiones para la operacion
   char* regArg1 = recuperaResLC(lista);
   char* regArg2 = recuperaResLC(arg2);
@@ -136,8 +136,9 @@ ListaC crearLista2(ListaC lista, ListaC arg2, char* op) {
   //buscamos registros libres
   int reg = buscarReg();
   registros[reg] = 1;
-  char* registro;
+  char registro[4];
   sprintf(registro, "$t%d", reg);
+  printf("%s\n",registro);                 //debug
   PosicionListaC final = finalLC(lista);
   //crea la operacion
   Operacion operacion;
@@ -159,14 +160,15 @@ ListaC crearLista2(ListaC lista, ListaC arg2, char* op) {
 }
 
 ListaC crearLista3(ListaC lista, char* op){
-  printf("crearLista3\n");
+  printf("crearLista3\n");                 //debug
   //recuperamos los registros de las expresiones para la operacion
   char* regArg = recuperaResLC(lista);
   //buscamos registros libres
   int reg = buscarReg();
   registros[reg] = 1;
-  char* registro;
+  char registro[4];
   sprintf(registro, "$t%d", reg);
+  printf("%s\n",registro);                 //debug
   PosicionListaC final = finalLC(lista);
   //crear op
   Operacion operacion;
@@ -184,7 +186,7 @@ ListaC crearLista3(ListaC lista, char* op){
 }
 
 ListaC listaIf(ListaC cond, ListaC st) {
-  printf("listaIf\n");
+  printf("listaIf\n");                                //debug
       //recuperamos los registros de las expresiones
   char* regCond = recuperaResLC(cond);
   char* regSt = recuperaResLC(st);
@@ -219,10 +221,11 @@ ListaC listaIf(ListaC cond, ListaC st) {
 }
 
 ListaC listaPrintItem(int cadena) {
-  printf("listaPrintItem\n");
+  printf("listaPrintItem\n");           //debug
   ListaC lista = creaLC();
-  char* str;
+  char str[10];
   sprintf(str, "$str%d", cadena);
+  printf("[%s]\n",str);                 //debug
   // la $a0, $strX
   Operacion op_la;
   op_la.op = "la";
