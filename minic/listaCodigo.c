@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include <stdio.h>
 
 
 struct PosicionListaCRep {
@@ -117,7 +116,7 @@ char * recuperaResLC(ListaC codigo) {
   return codigo->res;
 }
 
-void debugLista(ListaC lista){
+/*void debugLista(ListaC lista){
   PosicionListaC aux = inicioLC(lista);
   int n = longitudLC(lista);
   printf("Info de lista:\n Longitud:%d\n",n);
@@ -129,5 +128,4 @@ void debugLista(ListaC lista){
     cont++; 
     aux = aux->sig;
   }
-
-}
+}*/
