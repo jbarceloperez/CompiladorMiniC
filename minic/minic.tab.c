@@ -1669,7 +1669,7 @@ ListaC crearLista(char* arg1, char* op)		// esto vale para id y num, solo cambia
   int reg = buscarReg();
   printf("reg=%d\n",reg);
   registros[reg] = 1;
-  char registro[3];
+  char registro[4];
   sprintf(registro, "$t%d", reg);
   printf("%s\n",registro);
   PosicionListaC inicio = inicioLC(lista);
@@ -1697,8 +1697,9 @@ ListaC crearLista2(ListaC lista, ListaC arg2, char* op) {
   //buscamos registros libres
   int reg = buscarReg();
   registros[reg] = 1;
-  char* registro;
+  char registro[4];
   sprintf(registro, "$t%d", reg);
+  printf("%s\n",registro);
   PosicionListaC final = finalLC(lista);
   //crea la operacion
   Operacion operacion;
@@ -1726,8 +1727,9 @@ ListaC crearLista3(ListaC lista, char* op){
   //buscamos registros libres
   int reg = buscarReg();
   registros[reg] = 1;
-  char* registro;
+  char registro[4];
   sprintf(registro, "$t%d", reg);
+  printf("%s\n",registro);
   PosicionListaC final = finalLC(lista);
   //crear op
   Operacion operacion;
@@ -1782,8 +1784,9 @@ ListaC listaIf(ListaC cond, ListaC st) {
 ListaC listaPrintItem(int cadena) {
   printf("listaPrintItem\n");
   ListaC lista = creaLC();
-  char* str;
+  char str[10];
   sprintf(str, "$str%d", cadena);
+  printf("[%s]\n",str);
   // la $a0, $strX
   Operacion op_la;
   op_la.op = "la";
