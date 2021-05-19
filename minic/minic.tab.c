@@ -1685,36 +1685,54 @@ void yyerror()
 
 ListaC crearLista(char* arg1, char* op)		// esto vale para id y num, solo cambia el tipo de op (li o lw)
 {
-  printf("crearLista\n");
+  printf("crearLista %s\n", op);
   ListaC lista = creaLC();
   int reg = buscarReg();
-  printf("reg=%d\n",reg);                 //debug
+  printf("reg=%d\n",reg);                   //debug
   registros[reg] = 1;
   char registro[4];
   sprintf(registro, "$t%d", reg);
-  printf("%s\n",registro);                 //debug
+  printf("%s\n",registro);                  //debug
   PosicionListaC inicio = inicioLC(lista);
   //Creamos la operación
   Operacion operacion;
   operacion.op = op;
   operacion.res = registro;
-  operacion.arg1 = arg1;
-  printf("1\n");                 //debug
+  if (op=="lw"){    // si es un id, se le coloca el '_' delante del nombre
+    char arg[16];
+    sprintf(arg, "_%s", arg1);
+    operacion.arg1 = arg;
+  }
+  else {operacion.arg1 = arg1;}
+  printf("%s\t%s,%s\n",operacion.op, operacion.res, operacion.arg1);   //debug
   //Insertamos la operación en la lista
   insertaLC(lista, inicio, operacion);
   guardaResLC(lista, registro);
-  printf("0\n");                 //debug
+  int i;for (i=0;i<10;i++) printf("[%d]", registros[i]); printf(" %s\n\n", recuperaResLC(lista));    //debug
   return lista;
 }
 
 ListaC crearLista2(ListaC lista, ListaC arg2, char* op) {
-  printf("crearLista2\n");                 //debug
+  printf("crearLista2 %s\n", op);                 //debug
+  printf("Long1:%d,Long2:%d\n",longitudLC(lista), longitudLC(arg2));      //debug
+  printf("1:%s,2:%s\n",recuperaLC(lista,inicioLC(lista)).res, recuperaLC(arg2,inicioLC(arg2)).res);      //debug
   //recuperamos los registros de las expresiones para la operacion
   char* regArg1 = recuperaResLC(lista);
   char* regArg2 = recuperaResLC(arg2);
+  printf("resArg1 = %s, resArg2 = %s\n",regArg1, regArg2);                 //debug
   //concatena listas
   concatenaLC(lista, arg2);
   liberaLC(arg2);
+  printf("Long1:%d\n",longitudLC(lista));      //debug
+
+
+
+  Operacion op1=recuperaLC(lista,inicioLC(lista));
+  Operacion op2=recuperaLC(lista,siguienteLC(lista,inicioLC(lista)));
+  printf("[1]: %s\t%s,%s,%s\n",op1.op, op1.res, op1.arg1, op1.arg2);   //debug
+  printf("[2]: %s\t%s,%s,%s\n",op2.op, op2.res, op2.arg1, op2.arg2);   //debug
+  
+  
   //buscamos registros libres
   int reg = buscarReg();
   registros[reg] = 1;
@@ -1728,16 +1746,21 @@ ListaC crearLista2(ListaC lista, ListaC arg2, char* op) {
   operacion.res = registro;
   operacion.arg1 = regArg1;
   operacion.arg2 = regArg2;
+  printf("%s\t%s,%s,%s\n",operacion.op, operacion.res, operacion.arg1, operacion.arg2);   //debug
   //liberamos registros
   char r = regArg1[2];
   char rr = regArg2[2];
+  printf("r = %c, rr = %c\n", r, rr);      //debug
   int r1 = r - '0';
   int r2 = rr - '0';
+  printf("r1 = %d, r2 = %d\n", r1, r2);      //debug
   registros[r1] = 0;
   registros[r2] = 0;
   //insertar la op al final de la lista
   insertaLC(lista, final, operacion);
   guardaResLC(lista, registro);
+  int i;  for (i=0;i<10;i++) printf("[%d]", registros[i]); printf("\n");    //debug
+
   return lista;
 }
 
@@ -1745,6 +1768,7 @@ ListaC crearLista3(ListaC lista, char* op){
   printf("crearLista3\n");                 //debug
   //recuperamos los registros de las expresiones para la operacion
   char* regArg = recuperaResLC(lista);
+  printf("resArg = %s\n",regArg);                 //debug
   //buscamos registros libres
   int reg = buscarReg();
   registros[reg] = 1;
@@ -1759,11 +1783,15 @@ ListaC crearLista3(ListaC lista, char* op){
   operacion.arg1 = regArg;  
   //liberamos registros
   char r = regArg[2];
+  printf("r = %c\n",r);      //debug
   int r1 = r - '0';
   registros[r1] = 0;
+  printf("r1 = %d\n", r1);
   // insertar op
   insertaLC(lista, final, operacion);
   guardaResLC(lista, registro);
+  int i;for (i=0;i<10;i++) printf("[%d]", registros[i]); printf("\n");    //debug
+
   return lista;    
 }
 
@@ -1799,6 +1827,7 @@ ListaC listaIf(ListaC cond, ListaC st) {
   sprintf(etq, "%s:", tag);
   etiqueta.op = etq;
   insertaLC(cond, final, etiqueta);
+  int i;for (i=0;i<10;i++) printf("[%d]", registros[i]); printf("\n");    //debug
   return cond;
 }
 
@@ -1826,6 +1855,7 @@ ListaC listaPrintItem(int cadena) {
   syscall.op = "syscall";
   final = finalLC(lista);
   insertaLC(lista, final, syscall);
+  int i;for (i=0;i<10;i++) printf("[%d]", registros[i]); printf("\n");    //debug
   return lista; 
 }
 
@@ -1854,6 +1884,7 @@ ListaC listaPrintExpresion(ListaC lista) {
   syscall.op = "syscall";
   final = finalLC(lista);
   insertaLC(lista, final, syscall);
+  int i;for (i=0;i<10;i++) printf("[%d]", registros[i]); printf("\n");    //debug
   return lista;
 }
 
