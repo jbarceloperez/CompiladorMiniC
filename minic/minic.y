@@ -261,13 +261,15 @@ ListaC if_else(ListaC exp, ListaC stat1, ListaC stat2) {
 	char* et2 = obtenerEtiqueta();
 	Operacion b;
 	b.op = "b";
-	b.res = NULL;
-	b.arg1 = et2;
+	b.res = et2;
+	b.arg1 = NULL;
 	b.arg2 = NULL;
 	insertaLC(exp, finalLC(exp), b);
 	//Insertamos et1
+	char etq1[10];
+	sprintf(etq1, "%s:", et1);
 	Operacion etiq1;
-	etiq1.op = et1;
+	etiq1.op = strdup(et1);
 	etiq1.res = NULL;
 	etiq1.arg1 = NULL;
 	etiq1.arg2 = NULL;
@@ -276,8 +278,10 @@ ListaC if_else(ListaC exp, ListaC stat1, ListaC stat2) {
 	concatenaLC(exp, stat2);
 	liberaLC(stat2);
 	//Insertamos et2
+	char etq2[10];
+	sprintf(etq2, "%s:", et2);
 	Operacion etiq2;
-	etiq2.op = et2;
+	etiq2.op = strdup(etq2);
 	etiq2.res = NULL;
 	etiq2.arg1 = NULL;
 	etiq2.arg2 = NULL;

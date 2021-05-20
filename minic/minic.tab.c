@@ -1887,8 +1887,8 @@ ListaC if_else(ListaC exp, ListaC stat1, ListaC stat2) {
 	char* et2 = obtenerEtiqueta();
 	Operacion b;
 	b.op = "b";
-	b.res = NULL;
-	b.arg1 = et2;
+	b.res = et2;
+	b.arg1 = NULL;
 	b.arg2 = NULL;
 	insertaLC(exp, finalLC(exp), b);
 	//Insertamos et1
