@@ -1837,31 +1837,23 @@ ListaC listaIf(ListaC cond, ListaC st) {
 	printf("listaIf\n");                                //debug
 		//recuperamos los registros de las expresiones
 	char* regCond = recuperaResLC(cond);
-	printf("recupera regCond\n");
 	char* regSt = recuperaResLC(st);
-	printf("recupera regRes\n");
 		//creamos la etiqueta del salto
 	char* tag = obtenerEtiqueta();
 		//añade beqz
-	printf("genera etiqueta\n");
 	PosicionListaC final = finalLC(cond);
 	Operacion operacion;
 	operacion.op = "beqz";
 	operacion.res = regCond;
 	operacion.arg1 = tag;
 	operacion.arg2 = NULL;
-	printf("crear operacion\n");
 	//liberamos registros *¿qué hacemos con el registro res de la lista cond?
 	liberarReg(regCond);
 		// insertar la op
-	printf("liberar registros\n");
 	insertaLC(cond, final, operacion);
-	printf("insertar op\n");
 		//concatena listas
 	concatenaLC(cond, st);
-	printf("concatenar cond y st\n");
 	liberaLC(st);
-	printf("libera\n");
 	guardaResLC(cond, regSt);
 		//insertar etiqueta
 	final = finalLC(cond);
@@ -1872,7 +1864,6 @@ ListaC listaIf(ListaC cond, ListaC st) {
 	etiqueta.res = NULL;
 	etiqueta.arg1 = NULL;
 	etiqueta.arg2 = NULL;
-	printf("crea etiqueta\n");
 	insertaLC(cond, final, etiqueta);
 	int i;for (i=0;i<10;i++) printf("[%d]", registros[i]); printf("\n");    //debug
 	return cond;
