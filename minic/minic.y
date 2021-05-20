@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "listaSimbolos.h"
 #include "listaCodigo.h"
+#include <string.h>
 
 Lista tablaSimb;
 int contCadenas=0;
@@ -11,7 +12,7 @@ void anadeEntrada(char *lexema, Tipo tipo);
 int esConstante(char *lexema);
 void imprimirTablaS();
 
-int buscarReg();
+char* buscarReg();
 ListaC crearLista(char* arg1, char* op);
 ListaC crearLista2(ListaC lista, ListaC arg2, char* op);
 ListaC crearLista3(ListaC lista, char* op);
@@ -94,8 +95,9 @@ expression : expression MAS expression	  	  {$$ = crearLista2($1, $3, "add");}
            | expression DIV expression		  {$$ = crearLista2($1, $3, "div");}
            | MENOS expression %prec UMENOS	  {$$ = crearLista3($2, "neg");}
            | APAR expression CPAR		  	    {$$ = $2;}	// como la expresion ya es una listaC, no hace falta crear otra listaC
-           | ID								              {if (!perteneceTablaS($1)) printf("Error en línea %d: variable %s no declarada\n",yylineno,$1);$$ = crearLista($1, "lw");}
-           | NUM							              {$$ = crearLista($1, "li");}
+           | ID								    {if (!perteneceTablaS($1)) printf("Error en línea %d: variable %s no declarada\n",yylineno,$1);$$ = crearLista($1, "lw");}
+           | NUM							    {$$ = crearLista($1, "li");}          	
+		   										
            ;
 
 %%
@@ -109,10 +111,8 @@ ListaC crearLista(char* arg1, char* op)		// esto vale para id y num, solo cambia
 {
   	printf("crearLista %s\n", op);            //debug
 	ListaC lista = creaLC();
-	int reg = buscarReg();
-	registros[reg] = 1;
-	char registro[4];
-	sprintf(registro, "$t%d", reg);
+	char* registro = buscarReg();
+
 	PosicionListaC inicio = inicioLC(lista);
 	//Creamos la operación
 	Operacion operacion;
@@ -160,18 +160,18 @@ ListaC crearLista2(ListaC lista, ListaC arg2, char* op) {
 	printf("Long despues de concatenar:%d\n",longitudLC(lista));      //debug
 
 	//buscamos registros libres
-	int reg = buscarReg();
-	registros[reg] = 1;
-	char registro[4];
-	sprintf(registro, "$t%d", reg);
+	char* registro = buscarReg();
+
 	PosicionListaC final = finalLC(lista);
 	//crea la operacion
 	Operacion operacion;
 	operacion.op = op;
 	operacion.res = registro;
+	printf("recuperaResLC(lista1) = %s, recuperaResLC(lista2) = %s\n", regArg1, regArg2);                 //debug
 	operacion.arg1 = regArg1;
 	operacion.arg2 = regArg2;
 	printf("%s\t%s,%s,%s\n",operacion.op, operacion.res, operacion.arg1, operacion.arg2);   //debug
+	printf("recuperaResLC(lista1) = %s, recuperaResLC(lista2) = %s\n", regArg1, regArg2);                 //debug
 
 	//liberamos registros
 	char r = regArg1[2];
@@ -195,10 +195,7 @@ ListaC crearLista3(ListaC lista, char* op){
 	char* regArg = recuperaResLC(lista);
 	printf("resArg = %s\n",regArg);                 //debug
 	//buscamos registros libres
-	int reg = buscarReg();
-	registros[reg] = 1;
-	char registro[4];
-	sprintf(registro, "$t%d", reg);
+	char* registro = buscarReg();
 	printf("%s\n",registro);                 //debug
 	PosicionListaC final = finalLC(lista);
 	//crear op
@@ -363,11 +360,15 @@ void debugLista(ListaC lista){
 	}
 }
 
-int buscarReg()
+char* buscarReg()
 {
 	int i = 0;
 	while (registros[i] != 0) i++;
-	return i;
+
+	registros[i] = 1;
+	char registro[4];
+	sprintf(registro, "$t%d", i);
+	return strdup(registro);
 }
 
 int perteneceTablaS(char *lexema)
