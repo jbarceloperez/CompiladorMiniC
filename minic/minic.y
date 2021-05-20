@@ -11,17 +11,22 @@ int perteneceTablaS(char *lexema);
 void anadeEntrada(char *lexema, Tipo tipo);
 int esConstante(char *lexema);
 void imprimirTablaS();
+ListaC imprimirListaC(ListaC lista);
 
 char* buscarReg();
 ListaC crearLista(char* arg1, char* op);
 ListaC crearLista2(ListaC lista, ListaC arg2, char* op);
 ListaC crearLista3(ListaC lista, char* var, char* op);
+ListaC crearListaNeg(ListaC lista, char* op);
 ListaC listaIf(ListaC cond, ListaC st);
+ListaC if_else(ListaC exp, ListaC stat1, ListaC stat2);
 ListaC listaPrintItem(int cadena);
 ListaC listaPrintExpresion(ListaC arg);
 ListaC concatena(ListaC l1, ListaC l2);
 ListaC listaRead(char* cadena);
 void debugLista(ListaC lista);
+void liberarReg(char* registro);
+char *obtenerEtiqueta();
 
 int registros[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int tag_counter = 0;
@@ -48,7 +53,7 @@ ListaC codigo;
 
 %%
 
-program : {tablaSimb=creaLS();} VOID ID APAR CPAR ACOR declarations statement_list CCOR	{imprimirTablaS(); liberaLS(tablaSimb);}
+program : {tablaSimb=creaLS();} VOID ID APAR CPAR ACOR declarations statement_list CCOR	{imprimirTablaS(); liberaLS(tablaSimb); imprimirListaC($7);}
         ;
 
 declarations : declarations VAR {tipo=VARIABLE;} identifier_list SEMICOLON
@@ -64,15 +69,15 @@ asig : ID			                  {if (!perteneceTablaS($1)) anadeEntrada($1,tipo); 
      | ID IGUAL expression	    {if (!perteneceTablaS($1)) anadeEntrada($1,tipo); else printf("Error en línea %d: variable %s ya declarada\n",yylineno,$1); $$ = crearLista3($3, $1, "sw");}
      ;
 
-statement_list : statement_list statement
-               | /*empty*/
+statement_list : statement_list statement		{$$ = concatena($1, $2);}
+               | /*empty*/						{$$ = creaLC();printf("Aplica statement_list -> lambda \n");}
                ;
 
 statement : ID IGUAL expression SEMICOLON			  {if (!perteneceTablaS($1)) printf("Error en línea %d: variable %s no declarada\n",yylineno,$1); else if (esConstante($1)) printf("Error en línea %d: asignación a constante %s\n",yylineno,$1); $$ = crearLista3($3, $1, "sw");}
           | ACOR statement_list CCOR
           | IF APAR expression CPAR statement ELSE statement
           | IF APAR expression CPAR statement   {$$ = listaIf($3, $5);}
-          | WHILE APAR expression CPAR statement
+          | WHILE APAR expression CPAR statement{{printf("Aplica while \n");}}
           | PRINT print_list SEMICOLON          {$$ = $2;}
           | READ read_list SEMICOLON            {$$ = $2;}
           ;
@@ -93,7 +98,7 @@ expression : expression MAS expression	  	  {$$ = crearLista2($1, $3, "add");}
            | expression MENOS expression	  {$$ = crearLista2($1, $3, "sub");}
            | expression POR expression		  {$$ = crearLista2($1, $3, "mul");}
            | expression DIV expression		  {$$ = crearLista2($1, $3, "div");}
-           | MENOS expression %prec UMENOS	  {$$ = crearLista3($2, "neg");}
+           | MENOS expression %prec UMENOS	  {$$ = crearListaNeg($2, "neg");}
            | APAR expression CPAR		  	    {$$ = $2;}	// como la expresion ya es una listaC, no hace falta crear otra listaC
            | ID								    {if (!perteneceTablaS($1)) printf("Error en línea %d: variable %s no declarada\n",yylineno,$1);$$ = crearLista($1, "lw");}
            | NUM							    {$$ = crearLista($1, "li");}          	
@@ -110,7 +115,7 @@ void yyerror()
 ListaC crearLista(char* arg1, char* op)		// esto vale para id y num, solo cambia el tipo de op (li o lw)
 {
   	printf("crearLista %s\n", op);            //debug
-	  
+
 	ListaC lista = creaLC();
 	char* registro = buscarReg();
 	PosicionListaC inicio = inicioLC(lista);
@@ -138,35 +143,22 @@ ListaC crearLista2(ListaC lista, ListaC arg2, char* op) {
 	//recuperamos los registros de las expresiones para la operacion
 	char* regArg1 = recuperaResLC(lista);
 	char* regArg2 = recuperaResLC(arg2);
-	printf("recuperaResLC(lista1) = %s, recuperaResLC(lista2) = %s\n",recuperaResLC(lista), recuperaResLC(arg2));                 //debug
 	//concatena listas
 	concatenaLC(lista, arg2);
 	liberaLC(arg2);
-	printf("Long despues de concatenar:%d\n",longitudLC(lista));      //debug
-
 	//buscamos registros libres
 	char* registro = buscarReg();
-
 	PosicionListaC final = finalLC(lista);
 	//crea la operacion
 	Operacion operacion;
 	operacion.op = op;
 	operacion.res = registro;
-	printf("recuperaResLC(lista1) = %s, recuperaResLC(lista2) = %s\n", regArg1, regArg2);                 //debug
 	operacion.arg1 = regArg1;
 	operacion.arg2 = regArg2;
 	printf("%s\t%s,%s,%s\n",operacion.op, operacion.res, operacion.arg1, operacion.arg2);   //debug
-	printf("recuperaResLC(lista1) = %s, recuperaResLC(lista2) = %s\n", regArg1, regArg2);                 //debug
-
 	//liberamos registros
-	char r = regArg1[2];
-	char rr = regArg2[2];
-	printf("r = %c, rr = %c\n", r, rr);      //debug
-	int r1 = r - '0';
-	int r2 = rr - '0';
-	printf("r1 = %d, r2 = %d\n", r1, r2);      //debug
-	registros[r1] = 0;
-	registros[r2] = 0;
+	liberarReg(regArg1);
+	liberarReg(regArg2);
 	//insertar la op al final de la lista
 	insertaLC(lista, final, operacion);
 	guardaResLC(lista, registro);
@@ -174,14 +166,11 @@ ListaC crearLista2(ListaC lista, ListaC arg2, char* op) {
 	return lista;
 }
 
-ListaC crearLista3(ListaC lista, char* var, char* op){
+ListaC crearLista3(ListaC lista, char* var, char* op) {
 	printf("crearLista3\n");                 //debug
+
 	//recuperamos los registros de las expresiones para la operacion
 	char* regArg = recuperaResLC(lista);
-	printf("resArg = %s\n",regArg);                 //debug
-	//buscamos registros libres
-	// char* registro = buscarReg();
-	// printf("%s\n",registro);                 //debug
 	PosicionListaC final = finalLC(lista);
 	char arg[16];
 	sprintf(arg, "_%s", var);
@@ -191,18 +180,28 @@ ListaC crearLista3(ListaC lista, char* var, char* op){
 	operacion.res = regArg;
 	operacion.arg1 = arg;  
 	//liberamos registros
-	char r = regArg[2];
-	printf("r = %c\n",r);      //debug
-	int r1 = r - '0';
-	registros[r1] = 0;
-	printf("r1 = %d\n", r1);
+	liberarReg(regArg);
 	printf("%s\t%s,%s\n",operacion.op, operacion.res, operacion.arg1);   //debug
 	// insertar op
 	insertaLC(lista, final, operacion);
+	int i;for (i=0;i<10;i++) printf("[%d]", registros[i]); printf("\n");    //debug
+	return lista;    
+}
+
+ListaC crearListaNeg(ListaC lista, char* op){
+	char* regArg = recuperaResLC(lista);
+	PosicionListaC final = finalLC(lista);
+	Operacion operacion;
+	operacion.op = op;
+	operacion.res = buscarReg();
+	operacion.arg1 = regArg;  
+	//liberamos registros
+	liberarReg(regArg);
+	printf("%s\t%s,%s\n",operacion.op, operacion.res, operacion.arg1);   //debug
+	insertaLC(lista, final, operacion);
 	guardaResLC(lista, regArg);
 	int i;for (i=0;i<10;i++) printf("[%d]", registros[i]); printf("\n");    //debug
-
-	return lista;    
+	return lista;
 }
 
 ListaC listaIf(ListaC cond, ListaC st) {
@@ -211,25 +210,21 @@ ListaC listaIf(ListaC cond, ListaC st) {
 	char* regCond = recuperaResLC(cond);
 	char* regSt = recuperaResLC(st);
 		//creamos la etiqueta del salto
-	char* tag;
-	sprintf(tag, "ET%d", tag_counter);
-	tag_counter++;
+	char* tag = obtenerEtiqueta();
 		//añade beqz
 	PosicionListaC final = finalLC(cond);
 	Operacion operacion;
 	operacion.op = "beqz";
 	operacion.res = regCond;
 	operacion.arg1 = tag;
-		//liberamos registros ¿se libera el regCond que decide el salto? ¿qué hacemos con el registro res de la lista cond? ¿con cual nos quedamos?
-	char r = regCond[2];
-	int r1 = r - '0';
-	registros[r1] = 0;
+	//liberamos registros ¿se libera el regCond que decide el salto? ¿qué hacemos con el registro res de la lista cond? ¿con cual nos quedamos?
+	liberarReg(regCond);
 		// insertar la op
 	insertaLC(cond, final, operacion);
 		//concatena listas
 	concatenaLC(cond, st);
 	liberaLC(st); 
-	guardaResLC(cond, regSt);
+	// guardaResLC(cond, regSt);
 		//insertar etiqueta
 	final = finalLC(cond);
 	Operacion etiqueta;
@@ -239,6 +234,51 @@ ListaC listaIf(ListaC cond, ListaC st) {
 	insertaLC(cond, final, etiqueta);
 	int i;for (i=0;i<10;i++) printf("[%d]", registros[i]); printf("\n");    //debug
 	return cond;
+}
+
+ListaC if_else(ListaC exp, ListaC stat1, ListaC stat2) {
+	//Obtenemos el registro reg de exp para utilizarlo en el beqz
+	char* reg1 = recuperaResLC(exp);
+	//Creamos la operación beqz y la insertamos en la posición final
+	char* et1 = obtenerEtiqueta();
+	Operacion beqz;
+	beqz.op = "beqz";
+	beqz.res = reg1;
+	beqz.arg1 = et1;
+	beqz.arg2 = NULL;
+	insertaLC(exp, finalLC(exp), beqz);
+	//Concatenamos exp y stat1 (y la liberamos)
+	concatenaLC(exp, stat1);
+	liberaLC(stat1);
+	//Creamos la operación b y la insertamos en la posición final
+	char* et2 = obtenerEtiqueta();
+	Operacion b;
+	b.op = "b";
+	b.res = NULL;
+	b.arg1 = et2;
+	b.arg2 = NULL;
+	insertaLC(exp, finalLC(exp), b);
+	//Insertamos et1
+	Operacion etiq1;
+	etiq1.op = et1;
+	etiq1.res = NULL;
+	etiq1.arg1 = NULL;
+	etiq1.arg2 = NULL;
+	insertaLC(exp, finalLC(exp), etiq1);
+	//Concatenamos exp y stat2 (y la liberamos)
+	concatenaLC(exp, stat2);
+	liberaLC(stat2);
+	//Insertamos et2
+	Operacion etiq2;
+	etiq2.op = et2;
+	etiq2.res = NULL;
+	etiq2.arg1 = NULL;
+	etiq2.arg2 = NULL;
+	insertaLC(exp, finalLC(exp), etiq2);
+	//Liberamos registros
+	liberarReg(reg1);
+	//Devolvemos la lista
+	return exp;
 }
 
 ListaC listaPrintItem(int cadena) {
@@ -359,6 +399,21 @@ char* buscarReg()
 	return strdup(registro);
 }
 
+//Método para liberar registro
+void liberarReg(char* registro) {
+  char r = registro[2];
+  int reg = r - '0';
+  registros[reg] = 0;
+}
+
+
+//Métodos para traducir sentencias
+char *obtenerEtiqueta() {
+  char aux[32];
+  sprintf(aux, "$l%d", tag_counter++);
+  return strdup(aux);
+}
+
 int perteneceTablaS(char *lexema)
 {
 	PosicionLista posicion = buscaLS(tablaSimb, lexema);
@@ -403,4 +458,11 @@ void imprimirTablaS()
 		if (simbolo.tipo != STRING) printf("_%s:\t.word %d\n",simbolo.nombre,simbolo.valor);
 		posicion = siguienteLS(tablaSimb, posicion);
 	}
+}
+
+
+ListaC imprimirListaC(ListaC lista){
+	printf("###################\n# Seccion de codigo\n.text\n.globl main\nmain:\n");
+	
+
 }
