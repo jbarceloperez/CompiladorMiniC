@@ -69,7 +69,7 @@ asig : ID			                  	{if (!perteneceTablaS($1)) anadeEntrada($1,tipo);
      | ID IGUAL expression	    		{if (!perteneceTablaS($1)) anadeEntrada($1,tipo); else printf("Error en línea %d: variable %s ya declarada\n",yylineno,$1); $$ = crearLista3($3, $1, "sw");}
      ;
 
-statement_list : statement_list statement		{$$ = concatena($1, $2);}
+statement_list : statement_list statement		{printf("concatena statement_list\n");$$ = concatena($1, $2);}
                | /*empty*/						{$$ = creaLC();printf("Aplica statement_list -> lambda \n");}
                ;
 
@@ -83,7 +83,7 @@ statement : ID IGUAL expression SEMICOLON			  {if (!perteneceTablaS($1)) printf(
           ;
 
 print_list : print_item                         {$$ = $1;}
-           | print_list COMA print_item         {$$ = concatena($1, $3);}
+           | print_list COMA print_item         {printf("concatena print_list\n");$$ = concatena($1, $3);}
            ;
 
 print_item : expression              		{$$ = listaPrintExpresion($1);}
@@ -91,7 +91,7 @@ print_item : expression              		{$$ = listaPrintExpresion($1);}
            ;
 
 read_list : ID				             	{if (!perteneceTablaS($1)) printf("Error en línea %d: variable %s no declarada\n",yylineno,$1); else if (esConstante($1)) printf("Error en línea %d: asignación a constante %s\n",yylineno,$1); $$ = listaRead($1);}
-          | read_list COMA ID		    	{if (!perteneceTablaS($3)) printf("Error en línea %d: variable %s no declarada\n",yylineno,$3); else if (esConstante($3)) printf("Error en línea %d: asignación a constante %s\n",yylineno,$3); $$ = concatena($1, listaRead($3));}
+          | read_list COMA ID		    	{if (!perteneceTablaS($3)) printf("Error en línea %d: variable %s no declarada\n",yylineno,$3); else if (esConstante($3)) printf("Error en línea %d: asignación a constante %s\n",yylineno,$3);printf("concatena read_list\n"); $$ = concatena($1, listaRead($3));}
           ;
 
 expression : expression MAS expression	  	  {$$ = crearLista2($1, $3, "add");}
@@ -126,7 +126,7 @@ ListaC crearLista(char* arg1, char* op)		// esto vale para id y num, solo cambia
 	if (op=="lw"){    // si es un id, se le coloca el '_' delante del nombre
 		char arg[16];
 		sprintf(arg, "_%s", arg1);
-		operacion.arg1 = arg;
+		operacion.arg1 = strdup(arg);
 	}
 	else {operacion.arg1 = arg1;}
 	operacion.arg2 = NULL;
@@ -179,7 +179,7 @@ ListaC crearLista3(ListaC lista, char* var, char* op) {
 	Operacion operacion;
 	operacion.op = op;
 	operacion.res = regArg;
-	operacion.arg1 = arg;
+	operacion.arg1 = strdup(arg);
 	operacion.arg2 = NULL;  
 	//liberamos registros
 	liberarReg(regArg);
@@ -211,33 +211,42 @@ ListaC listaIf(ListaC cond, ListaC st) {
 	printf("listaIf\n");                                //debug
 		//recuperamos los registros de las expresiones
 	char* regCond = recuperaResLC(cond);
+	printf("recupera regCond\n");
 	char* regSt = recuperaResLC(st);
+	printf("recupera regRes\n");
 		//creamos la etiqueta del salto
 	char* tag = obtenerEtiqueta();
 		//añade beqz
+	printf("genera etiqueta\n");
 	PosicionListaC final = finalLC(cond);
 	Operacion operacion;
 	operacion.op = "beqz";
 	operacion.res = regCond;
 	operacion.arg1 = tag;
 	operacion.arg2 = NULL;
-	//liberamos registros ¿se libera el regCond que decide el salto? ¿qué hacemos con el registro res de la lista cond? ¿con cual nos quedamos?
+	printf("crear operacion\n");
+	//liberamos registros *¿qué hacemos con el registro res de la lista cond?
 	liberarReg(regCond);
 		// insertar la op
+	printf("liberar registros\n");
 	insertaLC(cond, final, operacion);
+	printf("insertar op\n");
 		//concatena listas
 	concatenaLC(cond, st);
-	liberaLC(st); 
-	// guardaResLC(cond, regSt);
+	printf("concatenar cond y st\n");
+	liberaLC(st);
+	printf("libera\n");
+	guardaResLC(cond, regSt);
 		//insertar etiqueta
 	final = finalLC(cond);
-	Operacion etiqueta;
-	char* etq;
+	char etq[10];
 	sprintf(etq, "%s:", tag);
-	etiqueta.op = etq;
+	Operacion etiqueta;
+	etiqueta.op = strdup(etq);
 	etiqueta.res = NULL;
 	etiqueta.arg1 = NULL;
 	etiqueta.arg2 = NULL;
+	printf("crea etiqueta\n");
 	insertaLC(cond, final, etiqueta);
 	int i;for (i=0;i<10;i++) printf("[%d]", registros[i]); printf("\n");    //debug
 	return cond;
@@ -293,17 +302,15 @@ ListaC listaPrintItem(int cadena) {
 	ListaC lista = creaLC();
 	char str[10];
 	sprintf(str, "$str%d", cadena);
-	printf("[%s]\n",str);                 //debug
-	// la $a0, $strX
+	// añadir el la $a0, $strX
 	Operacion op_la;
 	op_la.op = "la";
 	op_la.res = "$a0";
-	op_la.arg1 = str;
+	op_la.arg1 = strdup(str);
 	op_la.arg2 = NULL;
-
 	PosicionListaC final = finalLC(lista);
 	insertaLC(lista, final, op_la);
-	// li $v0, 4
+	// añadir el li $v0, 4
 	Operacion op_li;
 	op_li.op = "li";
 	op_li.res = "$v0";
@@ -355,6 +362,8 @@ ListaC listaPrintExpresion(ListaC lista) {
 
 ListaC concatena(ListaC l1, ListaC l2){
 	printf("concatena\n");           //debug
+	debugLista(l1);
+	debugLista(l2);
 	concatenaLC(l1, l2);
 	liberaLC(l2);
 	return l1;
@@ -362,13 +371,13 @@ ListaC concatena(ListaC l1, ListaC l2){
 
 ListaC listaRead(char* cadena){
 	printf("listaRead\n");           //debug
-	printf("%s\n", cadena);          //debug
 	ListaC lista = creaLC();
 	// li $v0, 5
 	Operacion op_li;
 	op_li.op = "li";
 	op_li.res = "$v0";
 	op_li.arg1 = "5";
+	op_li.arg2 = NULL;
 	PosicionListaC final = finalLC(lista);
 	insertaLC(lista, final, op_li);
 	Operacion syscall;
@@ -379,13 +388,13 @@ ListaC listaRead(char* cadena){
 	final = finalLC(lista);
 	insertaLC(lista, final, syscall);
 	// sw $v0, _X
+	char arg[16];
+	sprintf(arg, "_%s", cadena);
 	Operacion op_sw;
 	op_sw.op = "sw";
 	op_sw.res = "$v0";
-	char arg[16];
-	sprintf(arg, "_%s", cadena);
-	printf("%s\n", arg);                      //debug
-	op_sw.arg1 = arg;
+	op_sw.arg1 = strdup(arg);
+	op_sw.arg2 = NULL;
 	final = finalLC(lista);
 	insertaLC(lista, final, op_sw); 
 	return lista;
@@ -397,13 +406,16 @@ void debugLista(ListaC lista){
 	printf("Info de lista:\n Longitud:%d\n",n);
 	if (inicioLC(lista)==finalLC(lista)) printf("algo va mal...\n");
 	int cont=0;
-	while(siguienteLC(lista, aux)!=NULL){
-		printf("[%d]\t%s\t%s,%s", cont, recuperaLC(lista, siguienteLC(lista, aux)).op, recuperaLC(lista, siguienteLC(lista, aux)).res, recuperaLC(lista, siguienteLC(lista, aux)).arg1);
-		if (recuperaLC(lista, siguienteLC(lista, aux)).arg2!=NULL) printf(",%s\n",recuperaLC(lista, siguienteLC(lista, aux)).arg2);
+	while(aux!=finalLC(lista)){
+		printf("[%d]\t%s", cont, recuperaLC(lista, aux).op);
+		if (recuperaLC(lista, aux).res!=NULL) printf("\t%s",recuperaLC(lista, aux).res);
+		if (recuperaLC(lista, aux).arg1!=NULL) printf(",%s",recuperaLC(lista, aux).arg1);
+		if (recuperaLC(lista, aux).arg2!=NULL) printf(",%s\n",recuperaLC(lista, aux).arg2);
 		else printf("\n");
 		cont++; 
 		aux = siguienteLC(lista, aux);
 	}
+	printf("Valor res de la lista: %s\n", recuperaResLC(lista));
 }
 
 char* buscarReg()
@@ -484,7 +496,7 @@ ListaC imprimirListaC(ListaC declarations, ListaC statements){
 	//recorrer declarations
 	PosicionListaC aux = inicioLC(declarations);
 	int n = longitudLC(declarations);
-	printf("##LongDec=%d\n",n);
+	printf("##LongDeclarations=%d\n",n);
 	// if (inicioLC(lista)==finalLC(lista)) printf("algo va mal...\n");
 	int cont=0;
 	while(aux!=finalLC(declarations)){
@@ -497,10 +509,12 @@ ListaC imprimirListaC(ListaC declarations, ListaC statements){
 	//recorrer statements
 	aux = inicioLC(statements);
 	n = longitudLC(statements);
-	printf("##LongDec=%d\n",n);
+	printf("##LongStatements=%d\n",n);
 	// if (inicioLC(lista)==finalLC(lista)) printf("algo va mal...\n");
 	while(aux!=finalLC(statements)){
-		printf("[%d]\t%s\t%s,%s", cont, recuperaLC(statements, aux).op, recuperaLC(statements, aux).res, recuperaLC(statements, aux).arg1);
+		printf("[%d]\t%s", cont, recuperaLC(statements, aux).op);
+		if (recuperaLC(statements, aux).res!=NULL) printf("\t%s",recuperaLC(statements, aux).res);
+		if (recuperaLC(statements, aux).arg1!=NULL) printf(",%s",recuperaLC(statements, aux).arg1);
 		if (recuperaLC(statements, aux).arg2!=NULL) printf(",%s\n",recuperaLC(statements, aux).arg2);
 		else printf("\n");
 		cont++; 
