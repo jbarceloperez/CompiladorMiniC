@@ -1,6 +1,6 @@
 void prueba() {
     var c=1,d;
     d=c+1;
-	if (d) print d;
-    else print "hola", d, "\n";
+	if (d) print "hola";
+    else print "adios";
 }

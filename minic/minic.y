@@ -73,13 +73,13 @@ statement_list : statement_list statement		{printf("concatena statement_list\n")
                | /*empty*/						{$$ = creaLC();printf("Aplica statement_list -> lambda \n");}
                ;
 
-statement : ID IGUAL expression SEMICOLON			  {if (!perteneceTablaS($1)) printf("Error en línea %d: variable %s no declarada\n",yylineno,$1); else if (esConstante($1)) printf("Error en línea %d: asignación a constante %s\n",yylineno,$1); $$ = crearLista3($3, $1, "sw");}
-          | ACOR statement_list CCOR
-          | IF APAR expression CPAR statement ELSE statement
-          | IF APAR expression CPAR statement   {$$ = listaIf($3, $5);}
-          | WHILE APAR expression CPAR statement{{printf("Aplica while \n");}}
-          | PRINT print_list SEMICOLON          {$$ = $2;}
-          | READ read_list SEMICOLON            {$$ = $2;}
+statement : ID IGUAL expression SEMICOLON				{if (!perteneceTablaS($1)) printf("Error en línea %d: variable %s no declarada\n",yylineno,$1); else if (esConstante($1)) printf("Error en línea %d: asignación a constante %s\n",yylineno,$1); $$ = crearLista3($3, $1, "sw");}
+          | ACOR statement_list CCOR					{printf("aplica corchetes\n");$$ = $2;}
+          | IF APAR expression CPAR statement ELSE statement	{$$ = if_else($3, $5, $7);}
+          | IF APAR expression CPAR statement   		{$$ = listaIf($3, $5);}
+          | WHILE APAR expression CPAR statement		{printf("Aplica while \n");}
+          | PRINT print_list SEMICOLON          		{$$ = $2;}
+          | READ read_list SEMICOLON            		{$$ = $2;}
           ;
 
 print_list : print_item                         {$$ = $1;}
@@ -244,6 +244,8 @@ ListaC listaIf(ListaC cond, ListaC st) {
 }
 
 ListaC if_else(ListaC exp, ListaC stat1, ListaC stat2) {
+	printf("lista IF ELSE\n");                                //debug
+	
 	//Obtenemos el registro reg de exp para utilizarlo en el beqz
 	char* reg1 = recuperaResLC(exp);
 	//Creamos la operación beqz y la insertamos en la posición final
@@ -269,11 +271,12 @@ ListaC if_else(ListaC exp, ListaC stat1, ListaC stat2) {
 	char etq1[10];
 	sprintf(etq1, "%s:", et1);
 	Operacion etiq1;
-	etiq1.op = strdup(et1);
+	etiq1.op = strdup(etq1);
 	etiq1.res = NULL;
 	etiq1.arg1 = NULL;
 	etiq1.arg2 = NULL;
 	insertaLC(exp, finalLC(exp), etiq1);
+	printf("aquí hay un fallo al concatenar, no sé si es por el while o algo\n");				//debug
 	//Concatenamos exp y stat2 (y la liberamos)
 	concatenaLC(exp, stat2);
 	liberaLC(stat2);
@@ -289,6 +292,7 @@ ListaC if_else(ListaC exp, ListaC stat1, ListaC stat2) {
 	//Liberamos registros
 	liberarReg(reg1);
 	//Devolvemos la lista
+	int i;for (i=0;i<10;i++) printf("[%d]", registros[i]); printf("\n");    //debug
 	return exp;
 }
 
@@ -392,7 +396,8 @@ ListaC listaRead(char* cadena){
 	op_sw.arg1 = strdup(arg);
 	op_sw.arg2 = NULL;
 	final = finalLC(lista);
-	insertaLC(lista, final, op_sw); 
+	insertaLC(lista, final, op_sw);
+	int i;for (i=0;i<10;i++) printf("[%d]", registros[i]); printf("\n");    //debug
 	return lista;
 }
 
