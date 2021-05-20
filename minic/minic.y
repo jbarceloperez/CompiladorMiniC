@@ -115,7 +115,6 @@ void yyerror()
 ListaC crearLista(char* arg1, char* op)		// esto vale para id y num, solo cambia el tipo de op (li o lw)
 {
   	printf("crearLista %s\n", op);            //debug
-	    	printf("crearLista %s\n", op);            //debug
 
 	ListaC lista = creaLC();
 	char* registro = buscarReg();
