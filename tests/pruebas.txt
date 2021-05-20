@@ -1,5 +1,5 @@
 void prueba() {
     var c=1,d;
     d=c+1;
-	if (d) print "hola";
+	if (d) print d;
 }

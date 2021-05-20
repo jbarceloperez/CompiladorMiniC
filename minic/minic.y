@@ -330,9 +330,7 @@ ListaC listaPrintExpresion(ListaC lista) {
 	op_move.arg1 = regLista;
 	op_move.arg2 = NULL;
 	// se libera el registro
-	char r = regLista[2];
-	int r1 = r - '0';
-	registros[r1] = 0;
+	liberarReg(regLista);
 	PosicionListaC final = finalLC(lista);
 	insertaLC(lista, final, op_move);
 	// li $v0, 1
@@ -345,6 +343,9 @@ ListaC listaPrintExpresion(ListaC lista) {
 	insertaLC(lista, final, op_li);
 	Operacion syscall;
 	syscall.op = "syscall";
+	syscall.res = NULL;
+	syscall.arg1 = NULL;
+	syscall.arg2 = NULL;
 	final = finalLC(lista);
 	insertaLC(lista, final, syscall);
 	int i;for (i=0;i<10;i++) printf("[%d]", registros[i]); printf("\n");    //debug
