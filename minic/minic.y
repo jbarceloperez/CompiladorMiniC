@@ -15,7 +15,7 @@ void imprimirTablaS();
 char* buscarReg();
 ListaC crearLista(char* arg1, char* op);
 ListaC crearLista2(ListaC lista, ListaC arg2, char* op);
-ListaC crearLista3(ListaC lista, char* op);
+ListaC crearLista3(ListaC lista, char* var, char* op);
 ListaC listaIf(ListaC cond, ListaC st);
 ListaC listaPrintItem(int cadena);
 ListaC listaPrintExpresion(ListaC arg);
@@ -40,7 +40,7 @@ ListaC codigo;
 %token VOID VAR CONST IF ELSE WHILE PRINT READ SEMICOLON COMA IGUAL APAR CPAR ACOR CCOR
 //Indicamos el tipo de los tokens
 %token <cadena> CADENA ID NUM
-%type <codigo> expression statement statement_list print_item print_list read_list program declarations      // aunque no lo ponga en las diapositivas, hay que hacerlo así para poder asignarle al statement un valor de ListaC
+%type <codigo> expression statement statement_list print_item print_list read_list program declarations asig      // aunque no lo ponga en las diapositivas, hay que hacerlo así para poder asignarle al statement un valor de ListaC
 //Establecemos la precedencia y la asociatividad (una línea tiene más precedencia que las líneas anteriores)
 %left MAS MENOS
 %left POR DIV
@@ -61,14 +61,14 @@ identifier_list : asig
                 ;
 
 asig : ID			                  {if (!perteneceTablaS($1)) anadeEntrada($1,tipo); else printf("Error en línea %d: variable %s ya declarada\n",yylineno,$1);}
-     | ID IGUAL expression	    {if (!perteneceTablaS($1)) anadeEntrada($1,tipo); else printf("Error en línea %d: variable %s ya declarada\n",yylineno,$1);}
+     | ID IGUAL expression	    {if (!perteneceTablaS($1)) anadeEntrada($1,tipo); else printf("Error en línea %d: variable %s ya declarada\n",yylineno,$1); $$ = crearLista3($3, $1, "sw");}
      ;
 
 statement_list : statement_list statement
                | /*empty*/
                ;
 
-statement : ID IGUAL expression SEMICOLON			  {if (!perteneceTablaS($1)) printf("Error en línea %d: variable %s no declarada\n",yylineno,$1); else if (esConstante($1)) printf("Error en línea %d: asignación a constante %s\n",yylineno,$1); $$ = crearLista3($3, "sw");}
+statement : ID IGUAL expression SEMICOLON			  {if (!perteneceTablaS($1)) printf("Error en línea %d: variable %s no declarada\n",yylineno,$1); else if (esConstante($1)) printf("Error en línea %d: asignación a constante %s\n",yylineno,$1); $$ = crearLista3($3, $1, "sw");}
           | ACOR statement_list CCOR
           | IF APAR expression CPAR statement ELSE statement
           | IF APAR expression CPAR statement   {$$ = listaIf($3, $5);}
@@ -110,9 +110,9 @@ void yyerror()
 ListaC crearLista(char* arg1, char* op)		// esto vale para id y num, solo cambia el tipo de op (li o lw)
 {
   	printf("crearLista %s\n", op);            //debug
+	  
 	ListaC lista = creaLC();
 	char* registro = buscarReg();
-
 	PosicionListaC inicio = inicioLC(lista);
 	//Creamos la operación
 	Operacion operacion;
@@ -124,24 +124,9 @@ ListaC crearLista(char* arg1, char* op)		// esto vale para id y num, solo cambia
 		operacion.arg1 = arg;
 	}
 	else {operacion.arg1 = arg1;}
-	
 	//Insertamos la operación en la lista
 	insertaLC(lista, inicio, operacion);
 	guardaResLC(lista, registro);
-
-	// PosicionListaC aux = inicioLC(lista);
-	// int n = longitudLC(lista);
-	// printf("Info de lista:\n Longitud:%d\n",n);
-	// if (inicioLC(lista)==finalLC(lista)) printf("algo va mal...\n");
-	// int cont=0;
-	// while(siguienteLC(lista, aux)!=NULL){
-	// 	printf("[%d]\t%s\t%s,%s", cont, recuperaLC(lista, siguienteLC(lista, aux)).op, recuperaLC(lista, siguienteLC(lista, aux)).res, recuperaLC(lista, siguienteLC(lista, aux)).arg1);
-	// 	if (recuperaLC(lista, siguienteLC(lista, aux)).arg2!=NULL) printf(",%s\n",recuperaLC(lista, siguienteLC(lista, aux)).arg2);
-	// 	else printf("\n");
-	// 	cont++; 
-	// 	aux = siguienteLC(lista, aux);
-	// }
-
 	printf("%s\t%s,%s\n",operacion.op, operacion.res, operacion.arg1);   //debug
 	int i;for (i=0;i<10;i++) printf("[%d]", registros[i]); printf(" %s\n\n", recuperaResLC(lista));    //debug
 	return lista;
@@ -189,29 +174,32 @@ ListaC crearLista2(ListaC lista, ListaC arg2, char* op) {
 	return lista;
 }
 
-ListaC crearLista3(ListaC lista, char* op){
+ListaC crearLista3(ListaC lista, char* var, char* op){
 	printf("crearLista3\n");                 //debug
 	//recuperamos los registros de las expresiones para la operacion
 	char* regArg = recuperaResLC(lista);
 	printf("resArg = %s\n",regArg);                 //debug
 	//buscamos registros libres
-	char* registro = buscarReg();
-	printf("%s\n",registro);                 //debug
+	// char* registro = buscarReg();
+	// printf("%s\n",registro);                 //debug
 	PosicionListaC final = finalLC(lista);
+	char arg[16];
+	sprintf(arg, "_%s", var);
 	//crear op
 	Operacion operacion;
 	operacion.op = op;
-	operacion.res = registro;
-	operacion.arg1 = regArg;  
+	operacion.res = regArg;
+	operacion.arg1 = arg;  
 	//liberamos registros
 	char r = regArg[2];
 	printf("r = %c\n",r);      //debug
 	int r1 = r - '0';
 	registros[r1] = 0;
 	printf("r1 = %d\n", r1);
+	printf("%s\t%s,%s\n",operacion.op, operacion.res, operacion.arg1);   //debug
 	// insertar op
 	insertaLC(lista, final, operacion);
-	guardaResLC(lista, registro);
+	guardaResLC(lista, regArg);
 	int i;for (i=0;i<10;i++) printf("[%d]", registros[i]); printf("\n");    //debug
 
 	return lista;    

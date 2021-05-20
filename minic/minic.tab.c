@@ -80,7 +80,7 @@ void imprimirTablaS();
 char* buscarReg();
 ListaC crearLista(char* arg1, char* op);
 ListaC crearLista2(ListaC lista, ListaC arg2, char* op);
-ListaC crearLista3(ListaC lista, char* op);
+ListaC crearLista3(ListaC lista, char* var, char* op);
 ListaC listaIf(ListaC cond, ListaC st);
 ListaC listaPrintItem(int cadena);
 ListaC listaPrintExpresion(ListaC arg);
@@ -1336,13 +1336,13 @@ yyreduce:
 
   case 12:
 #line 64 "minic.y" /* yacc.c:1646  */
-    {if (!perteneceTablaS((yyvsp[-2].cadena))) anadeEntrada((yyvsp[-2].cadena),tipo); else printf("Error en línea %d: variable %s ya declarada\n",yylineno,(yyvsp[-2].cadena));}
+    {if (!perteneceTablaS((yyvsp[-2].cadena))) anadeEntrada((yyvsp[-2].cadena),tipo); else printf("Error en línea %d: variable %s ya declarada\n",yylineno,(yyvsp[-2].cadena)); (yyval.codigo) = crearLista3((yyvsp[0].codigo), (yyvsp[-2].cadena), "sw");}
 #line 1341 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
 #line 71 "minic.y" /* yacc.c:1646  */
-    {if (!perteneceTablaS((yyvsp[-3].cadena))) printf("Error en línea %d: variable %s no declarada\n",yylineno,(yyvsp[-3].cadena)); else if (esConstante((yyvsp[-3].cadena))) printf("Error en línea %d: asignación a constante %s\n",yylineno,(yyvsp[-3].cadena)); (yyval.codigo) = crearLista3((yyvsp[-1].codigo), "sw");}
+    {if (!perteneceTablaS((yyvsp[-3].cadena))) printf("Error en línea %d: variable %s no declarada\n",yylineno,(yyvsp[-3].cadena)); else if (esConstante((yyvsp[-3].cadena))) printf("Error en línea %d: asignación a constante %s\n",yylineno,(yyvsp[-3].cadena)); (yyval.codigo) = crearLista3((yyvsp[-1].codigo), (yyvsp[-3].cadena), "sw");}
 #line 1347 "minic.tab.c" /* yacc.c:1646  */
     break;
 
@@ -1677,7 +1677,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 112 "minic.y" /* yacc.c:1906  */
+#line 103 "minic.y" /* yacc.c:1906  */
 
 
 void yyerror()
@@ -1767,29 +1767,32 @@ ListaC crearLista2(ListaC lista, ListaC arg2, char* op) {
 	return lista;
 }
 
-ListaC crearLista3(ListaC lista, char* op){
+ListaC crearLista3(ListaC lista, char* var, char* op){
 	printf("crearLista3\n");                 //debug
 	//recuperamos los registros de las expresiones para la operacion
 	char* regArg = recuperaResLC(lista);
 	printf("resArg = %s\n",regArg);                 //debug
 	//buscamos registros libres
-	char* registro = buscarReg();
-	printf("%s\n",registro);                 //debug
+	// char* registro = buscarReg();
+	// printf("%s\n",registro);                 //debug
 	PosicionListaC final = finalLC(lista);
+	char arg[16];
+	sprintf(arg, "_%s", var);
 	//crear op
 	Operacion operacion;
 	operacion.op = op;
-	operacion.res = registro;
-	operacion.arg1 = regArg;  
+	operacion.res = regArg;
+	operacion.arg1 = arg;  
 	//liberamos registros
 	char r = regArg[2];
 	printf("r = %c\n",r);      //debug
 	int r1 = r - '0';
 	registros[r1] = 0;
 	printf("r1 = %d\n", r1);
+	printf("%s\t%s,%s\n",operacion.op, operacion.res, operacion.arg1);   //debug
 	// insertar op
 	insertaLC(lista, final, operacion);
-	guardaResLC(lista, registro);
+	// guardaResLC(lista, regArg);
 	int i;for (i=0;i<10;i++) printf("[%d]", registros[i]); printf("\n");    //debug
 
 	return lista;    
