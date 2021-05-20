@@ -76,7 +76,7 @@ int perteneceTablaS(char *lexema);
 void anadeEntrada(char *lexema, Tipo tipo);
 int esConstante(char *lexema);
 void imprimirTablaS();
-ListaC imprimirListaC(ListaC lista);
+ListaC imprimirListaC(ListaC declarations, ListaC statements);
 
 char* buscarReg();
 ListaC crearLista(char* arg1, char* op);
@@ -1317,7 +1317,7 @@ yyreduce:
 
   case 3:
 #line 56 "minic.y" /* yacc.c:1646  */
-    {imprimirTablaS(); liberaLS(tablaSimb); imprimirListaC((yyvsp[-2].codigo));}
+    {imprimirTablaS(); liberaLS(tablaSimb); imprimirListaC((yyvsp[-2].codigo), (yyvsp[-1].codigo));}
 #line 1322 "minic.tab.c" /* yacc.c:1646  */
     break;
 
@@ -1327,152 +1327,182 @@ yyreduce:
 #line 1328 "minic.tab.c" /* yacc.c:1646  */
     break;
 
+  case 5:
+#line 59 "minic.y" /* yacc.c:1646  */
+    {(yyval.codigo)=concatena((yyvsp[-4].codigo), (yyvsp[-1].codigo));}
+#line 1334 "minic.tab.c" /* yacc.c:1646  */
+    break;
+
   case 6:
 #line 60 "minic.y" /* yacc.c:1646  */
     {tipo=CONSTANTE;}
-#line 1334 "minic.tab.c" /* yacc.c:1646  */
+#line 1340 "minic.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 7:
+#line 60 "minic.y" /* yacc.c:1646  */
+    {(yyval.codigo)=concatena((yyvsp[-4].codigo), (yyvsp[-1].codigo));}
+#line 1346 "minic.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 8:
+#line 61 "minic.y" /* yacc.c:1646  */
+    {printf("Aplica declarations -> lambda \n");(yyval.codigo)=creaLC();}
+#line 1352 "minic.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 9:
+#line 64 "minic.y" /* yacc.c:1646  */
+    {(yyval.codigo) = (yyvsp[0].codigo);}
+#line 1358 "minic.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 10:
+#line 65 "minic.y" /* yacc.c:1646  */
+    {(yyval.codigo) = concatena((yyvsp[-2].codigo), (yyvsp[0].codigo));}
+#line 1364 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
 #line 68 "minic.y" /* yacc.c:1646  */
-    {if (!perteneceTablaS((yyvsp[0].cadena))) anadeEntrada((yyvsp[0].cadena),tipo); else printf("Error en línea %d: variable %s ya declarada\n",yylineno,(yyvsp[0].cadena));}
-#line 1340 "minic.tab.c" /* yacc.c:1646  */
+    {if (!perteneceTablaS((yyvsp[0].cadena))) anadeEntrada((yyvsp[0].cadena),tipo); else printf("Error en línea %d: variable %s ya declarada\n",yylineno,(yyvsp[0].cadena)); (yyval.codigo) = creaLC();}
+#line 1370 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
 #line 69 "minic.y" /* yacc.c:1646  */
     {if (!perteneceTablaS((yyvsp[-2].cadena))) anadeEntrada((yyvsp[-2].cadena),tipo); else printf("Error en línea %d: variable %s ya declarada\n",yylineno,(yyvsp[-2].cadena)); (yyval.codigo) = crearLista3((yyvsp[0].codigo), (yyvsp[-2].cadena), "sw");}
-#line 1346 "minic.tab.c" /* yacc.c:1646  */
+#line 1376 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
 #line 72 "minic.y" /* yacc.c:1646  */
     {(yyval.codigo) = concatena((yyvsp[-1].codigo), (yyvsp[0].codigo));}
-#line 1352 "minic.tab.c" /* yacc.c:1646  */
+#line 1382 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
 #line 73 "minic.y" /* yacc.c:1646  */
     {(yyval.codigo) = creaLC();printf("Aplica statement_list -> lambda \n");}
-#line 1358 "minic.tab.c" /* yacc.c:1646  */
+#line 1388 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
 #line 76 "minic.y" /* yacc.c:1646  */
     {if (!perteneceTablaS((yyvsp[-3].cadena))) printf("Error en línea %d: variable %s no declarada\n",yylineno,(yyvsp[-3].cadena)); else if (esConstante((yyvsp[-3].cadena))) printf("Error en línea %d: asignación a constante %s\n",yylineno,(yyvsp[-3].cadena)); (yyval.codigo) = crearLista3((yyvsp[-1].codigo), (yyvsp[-3].cadena), "sw");}
-#line 1364 "minic.tab.c" /* yacc.c:1646  */
+#line 1394 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
 #line 79 "minic.y" /* yacc.c:1646  */
     {(yyval.codigo) = listaIf((yyvsp[-2].codigo), (yyvsp[0].codigo));}
-#line 1370 "minic.tab.c" /* yacc.c:1646  */
+#line 1400 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 19:
 #line 80 "minic.y" /* yacc.c:1646  */
     {{printf("Aplica while \n");}}
-#line 1376 "minic.tab.c" /* yacc.c:1646  */
+#line 1406 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
 #line 81 "minic.y" /* yacc.c:1646  */
     {(yyval.codigo) = (yyvsp[-1].codigo);}
-#line 1382 "minic.tab.c" /* yacc.c:1646  */
+#line 1412 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 21:
 #line 82 "minic.y" /* yacc.c:1646  */
     {(yyval.codigo) = (yyvsp[-1].codigo);}
-#line 1388 "minic.tab.c" /* yacc.c:1646  */
+#line 1418 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 22:
 #line 85 "minic.y" /* yacc.c:1646  */
     {(yyval.codigo) = (yyvsp[0].codigo);}
-#line 1394 "minic.tab.c" /* yacc.c:1646  */
+#line 1424 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
 #line 86 "minic.y" /* yacc.c:1646  */
     {(yyval.codigo) = concatena((yyvsp[-2].codigo), (yyvsp[0].codigo));}
-#line 1400 "minic.tab.c" /* yacc.c:1646  */
+#line 1430 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
 #line 89 "minic.y" /* yacc.c:1646  */
     {(yyval.codigo) = listaPrintExpresion((yyvsp[0].codigo));}
-#line 1406 "minic.tab.c" /* yacc.c:1646  */
+#line 1436 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 25:
 #line 90 "minic.y" /* yacc.c:1646  */
     {anadeEntrada((yyvsp[0].cadena),STRING); (yyval.codigo) = listaPrintItem(contCadenas); contCadenas++;}
-#line 1412 "minic.tab.c" /* yacc.c:1646  */
+#line 1442 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 26:
 #line 93 "minic.y" /* yacc.c:1646  */
     {if (!perteneceTablaS((yyvsp[0].cadena))) printf("Error en línea %d: variable %s no declarada\n",yylineno,(yyvsp[0].cadena)); else if (esConstante((yyvsp[0].cadena))) printf("Error en línea %d: asignación a constante %s\n",yylineno,(yyvsp[0].cadena)); (yyval.codigo) = listaRead((yyvsp[0].cadena));}
-#line 1418 "minic.tab.c" /* yacc.c:1646  */
+#line 1448 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 27:
 #line 94 "minic.y" /* yacc.c:1646  */
     {if (!perteneceTablaS((yyvsp[0].cadena))) printf("Error en línea %d: variable %s no declarada\n",yylineno,(yyvsp[0].cadena)); else if (esConstante((yyvsp[0].cadena))) printf("Error en línea %d: asignación a constante %s\n",yylineno,(yyvsp[0].cadena)); (yyval.codigo) = concatena((yyvsp[-2].codigo), listaRead((yyvsp[0].cadena)));}
-#line 1424 "minic.tab.c" /* yacc.c:1646  */
+#line 1454 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 28:
 #line 97 "minic.y" /* yacc.c:1646  */
     {(yyval.codigo) = crearLista2((yyvsp[-2].codigo), (yyvsp[0].codigo), "add");}
-#line 1430 "minic.tab.c" /* yacc.c:1646  */
+#line 1460 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
 #line 98 "minic.y" /* yacc.c:1646  */
     {(yyval.codigo) = crearLista2((yyvsp[-2].codigo), (yyvsp[0].codigo), "sub");}
-#line 1436 "minic.tab.c" /* yacc.c:1646  */
+#line 1466 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 30:
 #line 99 "minic.y" /* yacc.c:1646  */
     {(yyval.codigo) = crearLista2((yyvsp[-2].codigo), (yyvsp[0].codigo), "mul");}
-#line 1442 "minic.tab.c" /* yacc.c:1646  */
+#line 1472 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 31:
 #line 100 "minic.y" /* yacc.c:1646  */
     {(yyval.codigo) = crearLista2((yyvsp[-2].codigo), (yyvsp[0].codigo), "div");}
-#line 1448 "minic.tab.c" /* yacc.c:1646  */
+#line 1478 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 32:
 #line 101 "minic.y" /* yacc.c:1646  */
     {(yyval.codigo) = crearListaNeg((yyvsp[0].codigo), "neg");}
-#line 1454 "minic.tab.c" /* yacc.c:1646  */
+#line 1484 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 33:
 #line 102 "minic.y" /* yacc.c:1646  */
     {(yyval.codigo) = (yyvsp[-1].codigo);}
-#line 1460 "minic.tab.c" /* yacc.c:1646  */
+#line 1490 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 34:
 #line 103 "minic.y" /* yacc.c:1646  */
     {if (!perteneceTablaS((yyvsp[0].cadena))) printf("Error en línea %d: variable %s no declarada\n",yylineno,(yyvsp[0].cadena));(yyval.codigo) = crearLista((yyvsp[0].cadena), "lw");}
-#line 1466 "minic.tab.c" /* yacc.c:1646  */
+#line 1496 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 35:
 #line 104 "minic.y" /* yacc.c:1646  */
     {(yyval.codigo) = crearLista((yyvsp[0].cadena), "li");}
-#line 1472 "minic.tab.c" /* yacc.c:1646  */
+#line 1502 "minic.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1476 "minic.tab.c" /* yacc.c:1646  */
+#line 1506 "minic.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1725,6 +1755,7 @@ ListaC crearLista(char* arg1, char* op)		// esto vale para id y num, solo cambia
 		operacion.arg1 = arg;
 	}
 	else {operacion.arg1 = arg1;}
+	operacion.arg2 = NULL;
 	//Insertamos la operación en la lista
 	insertaLC(lista, inicio, operacion);
 	guardaResLC(lista, registro);
@@ -1774,7 +1805,8 @@ ListaC crearLista3(ListaC lista, char* var, char* op) {
 	Operacion operacion;
 	operacion.op = op;
 	operacion.res = regArg;
-	operacion.arg1 = arg;  
+	operacion.arg1 = arg;
+	operacion.arg2 = NULL;  
 	//liberamos registros
 	liberarReg(regArg);
 	printf("%s\t%s,%s\n",operacion.op, operacion.res, operacion.arg1);   //debug
@@ -1790,7 +1822,8 @@ ListaC crearListaNeg(ListaC lista, char* op){
 	Operacion operacion;
 	operacion.op = op;
 	operacion.res = buscarReg();
-	operacion.arg1 = regArg;  
+	operacion.arg1 = regArg;
+	operacion.arg2 = NULL;  
 	//liberamos registros
 	liberarReg(regArg);
 	printf("%s\t%s,%s\n",operacion.op, operacion.res, operacion.arg1);   //debug
@@ -1813,6 +1846,7 @@ ListaC listaIf(ListaC cond, ListaC st) {
 	operacion.op = "beqz";
 	operacion.res = regCond;
 	operacion.arg1 = tag;
+	operacion.arg2 = NULL;
 	//liberamos registros ¿se libera el regCond que decide el salto? ¿qué hacemos con el registro res de la lista cond? ¿con cual nos quedamos?
 	liberarReg(regCond);
 		// insertar la op
@@ -1827,6 +1861,9 @@ ListaC listaIf(ListaC cond, ListaC st) {
 	char* etq;
 	sprintf(etq, "%s:", tag);
 	etiqueta.op = etq;
+	etiqueta.res = NULL;
+	etiqueta.arg1 = NULL;
+	etiqueta.arg2 = NULL;
 	insertaLC(cond, final, etiqueta);
 	int i;for (i=0;i<10;i++) printf("[%d]", registros[i]); printf("\n");    //debug
 	return cond;
@@ -1888,6 +1925,8 @@ ListaC listaPrintItem(int cadena) {
 	op_la.op = "la";
 	op_la.res = "$a0";
 	op_la.arg1 = str;
+	op_la.arg2 = NULL;
+
 	PosicionListaC final = finalLC(lista);
 	insertaLC(lista, final, op_la);
 	// li $v0, 4
@@ -1895,10 +1934,14 @@ ListaC listaPrintItem(int cadena) {
 	op_li.op = "li";
 	op_li.res = "$v0";
 	op_li.arg1 = "4";
+	op_li.arg2 = NULL;
 	final = finalLC(lista);
 	insertaLC(lista, final, op_li);
 	Operacion syscall;
 	syscall.op = "syscall";
+	syscall.res = NULL;
+	syscall.arg1 = NULL;
+	syscall.arg2 = NULL;
 	final = finalLC(lista);
 	insertaLC(lista, final, syscall);
 	int i;for (i=0;i<10;i++) printf("[%d]", registros[i]); printf("\n");    //debug
@@ -1913,6 +1956,7 @@ ListaC listaPrintExpresion(ListaC lista) {
 	op_move.op = "move";
 	op_move.res = "$a0";
 	op_move.arg1 = regLista;
+	op_move.arg2 = NULL;
 	// se libera el registro
 	char r = regLista[2];
 	int r1 = r - '0';
@@ -1924,6 +1968,7 @@ ListaC listaPrintExpresion(ListaC lista) {
 	op_li.op = "li";
 	op_li.res = "$v0";
 	op_li.arg1 = "1";
+	op_li.arg2 = NULL;
 	final = finalLC(lista);
 	insertaLC(lista, final, op_li);
 	Operacion syscall;
@@ -1954,6 +1999,9 @@ ListaC listaRead(char* cadena){
 	insertaLC(lista, final, op_li);
 	Operacion syscall;
 	syscall.op = "syscall";
+	syscall.res = NULL;
+	syscall.arg1 = NULL;
+	syscall.arg2 = NULL;
 	final = finalLC(lista);
 	insertaLC(lista, final, syscall);
 	// sw $v0, _X
@@ -2057,8 +2105,31 @@ void imprimirTablaS()
 }
 
 
-ListaC imprimirListaC(ListaC lista){
-	printf("###################\n# Seccion de codigo\n.text\n.globl main\nmain:\n");
-
-
+ListaC imprimirListaC(ListaC declarations, ListaC statements){
+	printf("\n############################\n# Seccion de codigo\n.text\n.globl main\n\nmain:\n");
+	//recorrer declarations
+	PosicionListaC aux = inicioLC(declarations);
+	int n = longitudLC(declarations);
+	printf("##LongDec=%d\n",n);
+	// if (inicioLC(lista)==finalLC(lista)) printf("algo va mal...\n");
+	int cont=0;
+	while(aux!=finalLC(declarations)){
+		printf("[%d]\t%s\t%s,%s", cont, recuperaLC(declarations, aux).op, recuperaLC(declarations, aux).res, recuperaLC(declarations, aux).arg1);
+		if (recuperaLC(declarations, aux).arg2!=NULL) printf(",%s\n",recuperaLC(declarations, aux).arg2);
+		else printf("\n");
+		cont++; 
+		aux = siguienteLC(declarations, aux);
+	}
+	//recorrer statements
+	aux = inicioLC(statements);
+	n = longitudLC(statements);
+	printf("##LongDec=%d\n",n);
+	// if (inicioLC(lista)==finalLC(lista)) printf("algo va mal...\n");
+	while(aux!=finalLC(statements)){
+		printf("[%d]\t%s\t%s,%s", cont, recuperaLC(statements, aux).op, recuperaLC(statements, aux).res, recuperaLC(statements, aux).arg1);
+		if (recuperaLC(statements, aux).arg2!=NULL) printf(",%s\n",recuperaLC(statements, aux).arg2);
+		else printf("\n");
+		cont++; 
+		aux = siguienteLC(statements, aux);
+	}
 }

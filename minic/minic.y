@@ -11,7 +11,7 @@ int perteneceTablaS(char *lexema);
 void anadeEntrada(char *lexema, Tipo tipo);
 int esConstante(char *lexema);
 void imprimirTablaS();
-ListaC imprimirListaC(ListaC lista);
+ListaC imprimirListaC(ListaC declarations, ListaC statements);
 
 char* buscarReg();
 ListaC crearLista(char* arg1, char* op);
@@ -45,7 +45,7 @@ ListaC codigo;
 %token VOID VAR CONST IF ELSE WHILE PRINT READ SEMICOLON COMA IGUAL APAR CPAR ACOR CCOR
 //Indicamos el tipo de los tokens
 %token <cadena> CADENA ID NUM
-%type <codigo> expression statement statement_list print_item print_list read_list program declarations asig      // aunque no lo ponga en las diapositivas, hay que hacerlo así para poder asignarle al statement un valor de ListaC
+%type <codigo> expression statement statement_list print_item print_list read_list program declarations asig identifier_list 
 //Establecemos la precedencia y la asociatividad (una línea tiene más precedencia que las líneas anteriores)
 %left MAS MENOS
 %left POR DIV
@@ -53,20 +53,20 @@ ListaC codigo;
 
 %%
 
-program : {tablaSimb=creaLS();} VOID ID APAR CPAR ACOR declarations statement_list CCOR	{imprimirTablaS(); liberaLS(tablaSimb); imprimirListaC($7);}
+program : {tablaSimb=creaLS();} VOID ID APAR CPAR ACOR declarations statement_list CCOR	{imprimirTablaS(); liberaLS(tablaSimb); imprimirListaC($7, $8);}
         ;
 
-declarations : declarations VAR {tipo=VARIABLE;} identifier_list SEMICOLON
-             | declarations CONST {tipo=CONSTANTE;} identifier_list SEMICOLON
-             | /*empty*/
+declarations : declarations VAR {tipo=VARIABLE;} identifier_list SEMICOLON			{$$=concatena($1, $4);}
+             | declarations CONST {tipo=CONSTANTE;} identifier_list SEMICOLON		{$$=concatena($1, $4);}
+             | /*empty*/			{printf("Aplica declarations -> lambda \n");$$=creaLC();}
              ;
 
-identifier_list : asig
-                | identifier_list COMA asig
+identifier_list : asig							{$$ = $1;}
+                | identifier_list COMA asig		{$$ = concatena($1, $3);}
                 ;
 
-asig : ID			                  {if (!perteneceTablaS($1)) anadeEntrada($1,tipo); else printf("Error en línea %d: variable %s ya declarada\n",yylineno,$1);}
-     | ID IGUAL expression	    {if (!perteneceTablaS($1)) anadeEntrada($1,tipo); else printf("Error en línea %d: variable %s ya declarada\n",yylineno,$1); $$ = crearLista3($3, $1, "sw");}
+asig : ID			                  	{if (!perteneceTablaS($1)) anadeEntrada($1,tipo); else printf("Error en línea %d: variable %s ya declarada\n",yylineno,$1); $$ = creaLC();}
+     | ID IGUAL expression	    		{if (!perteneceTablaS($1)) anadeEntrada($1,tipo); else printf("Error en línea %d: variable %s ya declarada\n",yylineno,$1); $$ = crearLista3($3, $1, "sw");}
      ;
 
 statement_list : statement_list statement		{$$ = concatena($1, $2);}
@@ -129,6 +129,7 @@ ListaC crearLista(char* arg1, char* op)		// esto vale para id y num, solo cambia
 		operacion.arg1 = arg;
 	}
 	else {operacion.arg1 = arg1;}
+	operacion.arg2 = NULL;
 	//Insertamos la operación en la lista
 	insertaLC(lista, inicio, operacion);
 	guardaResLC(lista, registro);
@@ -178,7 +179,8 @@ ListaC crearLista3(ListaC lista, char* var, char* op) {
 	Operacion operacion;
 	operacion.op = op;
 	operacion.res = regArg;
-	operacion.arg1 = arg;  
+	operacion.arg1 = arg;
+	operacion.arg2 = NULL;  
 	//liberamos registros
 	liberarReg(regArg);
 	printf("%s\t%s,%s\n",operacion.op, operacion.res, operacion.arg1);   //debug
@@ -194,7 +196,8 @@ ListaC crearListaNeg(ListaC lista, char* op){
 	Operacion operacion;
 	operacion.op = op;
 	operacion.res = buscarReg();
-	operacion.arg1 = regArg;  
+	operacion.arg1 = regArg;
+	operacion.arg2 = NULL;  
 	//liberamos registros
 	liberarReg(regArg);
 	printf("%s\t%s,%s\n",operacion.op, operacion.res, operacion.arg1);   //debug
@@ -217,6 +220,7 @@ ListaC listaIf(ListaC cond, ListaC st) {
 	operacion.op = "beqz";
 	operacion.res = regCond;
 	operacion.arg1 = tag;
+	operacion.arg2 = NULL;
 	//liberamos registros ¿se libera el regCond que decide el salto? ¿qué hacemos con el registro res de la lista cond? ¿con cual nos quedamos?
 	liberarReg(regCond);
 		// insertar la op
@@ -231,6 +235,9 @@ ListaC listaIf(ListaC cond, ListaC st) {
 	char* etq;
 	sprintf(etq, "%s:", tag);
 	etiqueta.op = etq;
+	etiqueta.res = NULL;
+	etiqueta.arg1 = NULL;
+	etiqueta.arg2 = NULL;
 	insertaLC(cond, final, etiqueta);
 	int i;for (i=0;i<10;i++) printf("[%d]", registros[i]); printf("\n");    //debug
 	return cond;
@@ -292,6 +299,8 @@ ListaC listaPrintItem(int cadena) {
 	op_la.op = "la";
 	op_la.res = "$a0";
 	op_la.arg1 = str;
+	op_la.arg2 = NULL;
+
 	PosicionListaC final = finalLC(lista);
 	insertaLC(lista, final, op_la);
 	// li $v0, 4
@@ -299,10 +308,14 @@ ListaC listaPrintItem(int cadena) {
 	op_li.op = "li";
 	op_li.res = "$v0";
 	op_li.arg1 = "4";
+	op_li.arg2 = NULL;
 	final = finalLC(lista);
 	insertaLC(lista, final, op_li);
 	Operacion syscall;
 	syscall.op = "syscall";
+	syscall.res = NULL;
+	syscall.arg1 = NULL;
+	syscall.arg2 = NULL;
 	final = finalLC(lista);
 	insertaLC(lista, final, syscall);
 	int i;for (i=0;i<10;i++) printf("[%d]", registros[i]); printf("\n");    //debug
@@ -317,6 +330,7 @@ ListaC listaPrintExpresion(ListaC lista) {
 	op_move.op = "move";
 	op_move.res = "$a0";
 	op_move.arg1 = regLista;
+	op_move.arg2 = NULL;
 	// se libera el registro
 	char r = regLista[2];
 	int r1 = r - '0';
@@ -328,6 +342,7 @@ ListaC listaPrintExpresion(ListaC lista) {
 	op_li.op = "li";
 	op_li.res = "$v0";
 	op_li.arg1 = "1";
+	op_li.arg2 = NULL;
 	final = finalLC(lista);
 	insertaLC(lista, final, op_li);
 	Operacion syscall;
@@ -358,6 +373,9 @@ ListaC listaRead(char* cadena){
 	insertaLC(lista, final, op_li);
 	Operacion syscall;
 	syscall.op = "syscall";
+	syscall.res = NULL;
+	syscall.arg1 = NULL;
+	syscall.arg2 = NULL;
 	final = finalLC(lista);
 	insertaLC(lista, final, syscall);
 	// sw $v0, _X
@@ -461,8 +479,31 @@ void imprimirTablaS()
 }
 
 
-ListaC imprimirListaC(ListaC lista){
-	printf("###################\n# Seccion de codigo\n.text\n.globl main\nmain:\n");
-	
-
+ListaC imprimirListaC(ListaC declarations, ListaC statements){
+	printf("\n############################\n# Seccion de codigo\n.text\n.globl main\n\nmain:\n");
+	//recorrer declarations
+	PosicionListaC aux = inicioLC(declarations);
+	int n = longitudLC(declarations);
+	printf("##LongDec=%d\n",n);
+	// if (inicioLC(lista)==finalLC(lista)) printf("algo va mal...\n");
+	int cont=0;
+	while(aux!=finalLC(declarations)){
+		printf("[%d]\t%s\t%s,%s", cont, recuperaLC(declarations, aux).op, recuperaLC(declarations, aux).res, recuperaLC(declarations, aux).arg1);
+		if (recuperaLC(declarations, aux).arg2!=NULL) printf(",%s\n",recuperaLC(declarations, aux).arg2);
+		else printf("\n");
+		cont++; 
+		aux = siguienteLC(declarations, aux);
+	}
+	//recorrer statements
+	aux = inicioLC(statements);
+	n = longitudLC(statements);
+	printf("##LongDec=%d\n",n);
+	// if (inicioLC(lista)==finalLC(lista)) printf("algo va mal...\n");
+	while(aux!=finalLC(statements)){
+		printf("[%d]\t%s\t%s,%s", cont, recuperaLC(statements, aux).op, recuperaLC(statements, aux).res, recuperaLC(statements, aux).arg1);
+		if (recuperaLC(statements, aux).arg2!=NULL) printf(",%s\n",recuperaLC(statements, aux).arg2);
+		else printf("\n");
+		cont++; 
+		aux = siguienteLC(statements, aux);
+	}
 }
