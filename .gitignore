@@ -1,3 +1,2 @@
-
-*.tab.c
-/minic/minic
+minic/minic.tab.c
+minic/minic
