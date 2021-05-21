@@ -247,7 +247,7 @@ ListaC if_else(ListaC exp, ListaC stat1, ListaC stat2) {
 	char* et2 = obtenerEtiqueta();
 	Operacion b;
 	b.op = "b";
-	b.res = et2;
+	b.res = strdup(et2);
 	b.arg1 = NULL;
 	b.arg2 = NULL;
 	insertaLC(exp, finalLC(exp), b);
@@ -320,12 +320,10 @@ ListaC while_(ListaC exp, ListaC stat){
 	char* reg = recuperaResLC(exp);
 	//Creamos la operación beqz y la insertamos en la posición final
 	char* et2 = obtenerEtiqueta();
-	char etq2[10];
-	sprintf(etq2, "%s:", et2);
 	Operacion beqz;
 	beqz.op = "beqz";
 	beqz.res = reg;
-	beqz.arg1 = strdup(etq2);
+	beqz.arg1 = et2;
 	beqz.arg2 = NULL;
 	insertaLC(exp, finalLC(exp), beqz);
 	//Liberamos el registro
@@ -336,11 +334,13 @@ ListaC while_(ListaC exp, ListaC stat){
 	//Creamos la operación b y la insertamos en la posición final
 	Operacion b;
 	b.op = "b";
-	b.arg1 = strdup(etq1);
+	b.res = et1;
 	b.arg1 = NULL;
 	b.arg2 = NULL;
 	insertaLC(exp, finalLC(exp), b);
 	//Insertamos et2 al final de exp
+	char etq2[10];
+	sprintf(etq2, "%s:", et2);
 	Operacion etiq2;
 	etiq2.op = strdup(etq2);
 	etiq2.res = NULL;
@@ -489,7 +489,7 @@ void liberarReg(char* registro) {
 //Métodos para traducir sentencias
 char *obtenerEtiqueta() {
   char aux[32];
-  sprintf(aux, "$l%d", tag_counter++);
+  sprintf(aux, "ET%d", tag_counter++);
   return strdup(aux);
 }
 
