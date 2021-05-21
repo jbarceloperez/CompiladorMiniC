@@ -85,6 +85,8 @@ ListaC crearLista3(ListaC lista, char* var, char* op);
 ListaC crearListaNeg(ListaC lista, char* op);
 ListaC listaIf(ListaC cond, ListaC st);
 ListaC if_else(ListaC exp, ListaC stat1, ListaC stat2);
+ListaC while_(ListaC exp, ListaC stat);
+ListaC do_while(ListaC stat, ListaC exp);
 ListaC listaPrintItem(int cadena);
 ListaC listaPrintExpresion(ListaC arg);
 ListaC concatena(ListaC l1, ListaC l2);
@@ -100,7 +102,7 @@ void yyerror();
 extern int yylex();
 extern int yylineno;
 
-#line 104 "minic.tab.c" /* yacc.c:339  */
+#line 106 "minic.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -150,14 +152,15 @@ extern int yydebug;
     CPAR = 270,
     ACOR = 271,
     CCOR = 272,
-    CADENA = 273,
-    ID = 274,
-    NUM = 275,
-    MAS = 276,
-    MENOS = 277,
-    POR = 278,
-    DIV = 279,
-    UMENOS = 280
+    DO = 273,
+    CADENA = 274,
+    ID = 275,
+    NUM = 276,
+    MAS = 277,
+    MENOS = 278,
+    POR = 279,
+    DIV = 280,
+    UMENOS = 281
   };
 #endif
 
@@ -166,12 +169,12 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 40 "minic.y" /* yacc.c:355  */
+#line 42 "minic.y" /* yacc.c:355  */
 
 char *cadena;
 ListaC codigo;
 
-#line 175 "minic.tab.c" /* yacc.c:355  */
+#line 178 "minic.tab.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -188,7 +191,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 192 "minic.tab.c" /* yacc.c:358  */
+#line 195 "minic.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -430,21 +433,21 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  3
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   98
+#define YYLAST   107
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  26
+#define YYNTOKENS  27
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  14
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  35
+#define YYNRULES  36
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  75
+#define YYNSTATES  81
 
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   280
+#define YYMAXUTOK   281
 
 #define YYTRANSLATE(YYX)                                                \
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -481,17 +484,17 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
-      25
+      25,    26
 };
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    56,    56,    56,    59,    59,    60,    60,    61,    64,
-      65,    68,    69,    72,    73,    76,    77,    78,    79,    80,
-      81,    82,    85,    86,    89,    90,    93,    94,    97,    98,
-      99,   100,   101,   102,   103,   104
+       0,    58,    58,    58,    61,    61,    62,    62,    63,    66,
+      67,    70,    71,    74,    75,    78,    79,    80,    81,    82,
+      83,    84,    85,    88,    89,    92,    93,    96,    97,   100,
+     101,   102,   103,   104,   105,   106,   107
 };
 #endif
 
@@ -502,10 +505,10 @@ static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "VOID", "VAR", "CONST", "IF", "ELSE",
   "WHILE", "PRINT", "READ", "SEMICOLON", "COMA", "IGUAL", "APAR", "CPAR",
-  "ACOR", "CCOR", "CADENA", "ID", "NUM", "MAS", "MENOS", "POR", "DIV",
-  "UMENOS", "$accept", "program", "$@1", "declarations", "$@2", "$@3",
-  "identifier_list", "asig", "statement_list", "statement", "print_list",
-  "print_item", "read_list", "expression", YY_NULLPTR
+  "ACOR", "CCOR", "DO", "CADENA", "ID", "NUM", "MAS", "MENOS", "POR",
+  "DIV", "UMENOS", "$accept", "program", "$@1", "declarations", "$@2",
+  "$@3", "identifier_list", "asig", "statement_list", "statement",
+  "print_list", "print_item", "read_list", "expression", YY_NULLPTR
 };
 #endif
 
@@ -516,7 +519,7 @@ static const yytype_uint16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
-     275,   276,   277,   278,   279,   280
+     275,   276,   277,   278,   279,   280,   281
 };
 # endif
 
@@ -534,14 +537,15 @@ static const yytype_uint16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-     -28,    12,    14,   -28,     1,    22,    23,    29,   -28,     6,
-     -28,   -28,    -1,     9,     9,    47,    59,    56,    40,   -28,
-     -28,    71,   -28,    77,    -8,   -28,    46,    63,    63,    63,
-     -28,   -28,   -28,    63,    60,   -28,    65,   -28,    68,    13,
-      63,    63,   -28,     9,   -28,    31,    41,    45,   -28,   -28,
-      56,    63,    63,    63,    63,   -28,    62,   -28,    26,    65,
-     -28,    25,    25,   -28,   -28,    19,    19,   -28,   -28,   -28,
-     -28,    84,   -28,    25,   -28
+     -28,     6,    14,   -28,    10,    -5,    19,    20,   -28,     0,
+     -28,   -28,     2,    18,    18,    28,    36,    68,    38,   -28,
+     -28,    31,    70,   -28,    77,    57,   -28,    61,    72,    72,
+      72,   -28,   -28,   -28,    72,    73,   -28,    74,   -28,    89,
+      15,    62,    72,    72,   -28,    18,   -28,    30,    41,    52,
+     -28,   -28,    68,    72,    72,    72,    72,   -28,    82,   -28,
+      80,    37,    74,   -28,    31,    31,   -28,   -28,   -11,   -11,
+     -28,   -28,   -28,    72,   -28,    96,   -28,    56,    31,   -28,
+     -28
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -551,26 +555,27 @@ static const yytype_uint8 yydefact[] =
 {
        2,     0,     0,     1,     0,     0,     0,     0,     8,    14,
        4,     6,     0,     0,     0,     0,     0,     0,     0,    14,
-       3,     0,    13,    11,     0,     9,     0,     0,     0,     0,
-      25,    34,    35,     0,     0,    22,    24,    26,     0,     0,
-       0,     0,     5,     0,     7,     0,     0,     0,    32,    20,
-       0,     0,     0,     0,     0,    21,     0,    16,     0,    12,
-      10,     0,     0,    33,    23,    28,    29,    30,    31,    27,
-      15,    18,    19,     0,    17
+       3,     0,     0,    13,    11,     0,     9,     0,     0,     0,
+       0,    26,    35,    36,     0,     0,    23,    25,    27,     0,
+       0,     0,     0,     0,     5,     0,     7,     0,     0,     0,
+      33,    21,     0,     0,     0,     0,     0,    22,     0,    16,
+       0,     0,    12,    10,     0,     0,    34,    24,    29,    30,
+      31,    32,    28,     0,    15,    18,    19,     0,     0,    20,
+      17
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -28,   -28,   -28,   -28,   -28,   -28,    78,    50,    75,   -22,
-     -28,    48,   -28,   -27
+     -28,   -28,   -28,   -28,   -28,   -28,    90,    60,    87,   -21,
+     -28,    55,   -28,   -27
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     1,     2,     9,    13,    14,    24,    25,    12,    22,
-      34,    35,    38,    36
+      -1,     1,     2,     9,    13,    14,    25,    26,    12,    23,
+      35,    36,    39,    37
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -578,53 +583,56 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-      45,    46,    47,    42,    43,    15,    48,    16,    17,    18,
-      10,    11,     3,    58,    59,    19,    20,     4,    21,    15,
-       5,    16,    17,    18,    65,    66,    67,    68,    23,    19,
-      57,    15,    21,    16,    17,    18,     6,    70,     7,    71,
-      72,    19,    53,    54,    21,     8,    61,    51,    52,    53,
-      54,    74,    51,    52,    53,    54,    62,    44,    43,    37,
-      63,    27,    51,    52,    53,    54,    51,    52,    53,    54,
-      29,    49,    50,    28,    30,    31,    32,    29,    33,    55,
-      56,    69,    31,    32,    40,    33,    51,    52,    53,    54,
-      41,    73,    26,    60,    39,     0,     0,     0,    64
+      41,    47,    48,    49,    10,    11,     3,    50,    15,     6,
+      16,    17,    18,    55,    56,    61,    62,     4,    19,    20,
+      21,    15,    22,    16,    17,    18,    68,    69,    70,    71,
+       5,    19,    59,    21,     7,    22,     8,    15,    24,    16,
+      17,    18,    28,    75,    76,    64,    77,    19,    74,    21,
+      29,    22,    53,    54,    55,    56,    65,    80,    38,    53,
+      54,    55,    56,    53,    54,    55,    56,    66,    44,    45,
+      60,    79,    46,    45,    53,    54,    55,    56,    53,    54,
+      55,    56,    30,    42,    51,    52,    30,    31,    32,    33,
+      43,    34,    32,    33,    73,    34,    53,    54,    55,    56,
+      57,    58,    72,    78,    27,    63,    40,    67
 };
 
-static const yytype_int8 yycheck[] =
+static const yytype_uint8 yycheck[] =
 {
-      27,    28,    29,    11,    12,     6,    33,     8,     9,    10,
-       4,     5,     0,    40,    41,    16,    17,     3,    19,     6,
-      19,     8,     9,    10,    51,    52,    53,    54,    19,    16,
-      17,     6,    19,     8,     9,    10,    14,    11,    15,    61,
-      62,    16,    23,    24,    19,    16,    15,    21,    22,    23,
-      24,    73,    21,    22,    23,    24,    15,    11,    12,    19,
-      15,    14,    21,    22,    23,    24,    21,    22,    23,    24,
-      14,    11,    12,    14,    18,    19,    20,    14,    22,    11,
-      12,    19,    19,    20,    13,    22,    21,    22,    23,    24,
-      13,     7,    14,    43,    19,    -1,    -1,    -1,    50
+      21,    28,    29,    30,     4,     5,     0,    34,     6,    14,
+       8,     9,    10,    24,    25,    42,    43,     3,    16,    17,
+      18,     6,    20,     8,     9,    10,    53,    54,    55,    56,
+      20,    16,    17,    18,    15,    20,    16,     6,    20,     8,
+       9,    10,    14,    64,    65,    15,    73,    16,    11,    18,
+      14,    20,    22,    23,    24,    25,    15,    78,    20,    22,
+      23,    24,    25,    22,    23,    24,    25,    15,    11,    12,
+       8,    15,    11,    12,    22,    23,    24,    25,    22,    23,
+      24,    25,    14,    13,    11,    12,    14,    19,    20,    21,
+      13,    23,    20,    21,    14,    23,    22,    23,    24,    25,
+      11,    12,    20,     7,    14,    45,    19,    52
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,    27,    28,     0,     3,    19,    14,    15,    16,    29,
-       4,     5,    34,    30,    31,     6,     8,     9,    10,    16,
-      17,    19,    35,    19,    32,    33,    32,    14,    14,    14,
-      18,    19,    20,    22,    36,    37,    39,    19,    38,    34,
-      13,    13,    11,    12,    11,    39,    39,    39,    39,    11,
-      12,    21,    22,    23,    24,    11,    12,    17,    39,    39,
-      33,    15,    15,    15,    37,    39,    39,    39,    39,    19,
-      11,    35,    35,     7,    35
+       0,    28,    29,     0,     3,    20,    14,    15,    16,    30,
+       4,     5,    35,    31,    32,     6,     8,     9,    10,    16,
+      17,    18,    20,    36,    20,    33,    34,    33,    14,    14,
+      14,    19,    20,    21,    23,    37,    38,    40,    20,    39,
+      35,    36,    13,    13,    11,    12,    11,    40,    40,    40,
+      40,    11,    12,    22,    23,    24,    25,    11,    12,    17,
+       8,    40,    40,    34,    15,    15,    15,    38,    40,    40,
+      40,    40,    20,    14,    11,    36,    36,    40,     7,    15,
+      36
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    26,    28,    27,    30,    29,    31,    29,    29,    32,
-      32,    33,    33,    34,    34,    35,    35,    35,    35,    35,
-      35,    35,    36,    36,    37,    37,    38,    38,    39,    39,
-      39,    39,    39,    39,    39,    39
+       0,    27,    29,    28,    31,    30,    32,    30,    30,    33,
+      33,    34,    34,    35,    35,    36,    36,    36,    36,    36,
+      36,    36,    36,    37,    37,    38,    38,    39,    39,    40,
+      40,    40,    40,    40,    40,    40,    40
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
@@ -632,8 +640,8 @@ static const yytype_uint8 yyr2[] =
 {
        0,     2,     0,     9,     0,     5,     0,     5,     0,     1,
        3,     1,     3,     2,     0,     4,     3,     7,     5,     5,
-       3,     3,     1,     3,     1,     1,     1,     3,     3,     3,
-       3,     3,     2,     3,     1,     1
+       6,     3,     3,     1,     3,     1,     1,     1,     3,     3,
+       3,     3,     3,     2,     3,     1,     1
 };
 
 
@@ -1310,211 +1318,217 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 56 "minic.y" /* yacc.c:1646  */
+#line 58 "minic.y" /* yacc.c:1646  */
     {tablaSimb=creaLS();}
-#line 1316 "minic.tab.c" /* yacc.c:1646  */
+#line 1324 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 56 "minic.y" /* yacc.c:1646  */
+#line 58 "minic.y" /* yacc.c:1646  */
     {imprimirTablaS(); liberaLS(tablaSimb); imprimirListaC((yyvsp[-2].codigo), (yyvsp[-1].codigo));}
-#line 1322 "minic.tab.c" /* yacc.c:1646  */
+#line 1330 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 59 "minic.y" /* yacc.c:1646  */
+#line 61 "minic.y" /* yacc.c:1646  */
     {tipo=VARIABLE;}
-#line 1328 "minic.tab.c" /* yacc.c:1646  */
+#line 1336 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 59 "minic.y" /* yacc.c:1646  */
+#line 61 "minic.y" /* yacc.c:1646  */
     {(yyval.codigo)=concatena((yyvsp[-4].codigo), (yyvsp[-1].codigo));}
-#line 1334 "minic.tab.c" /* yacc.c:1646  */
+#line 1342 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 60 "minic.y" /* yacc.c:1646  */
+#line 62 "minic.y" /* yacc.c:1646  */
     {tipo=CONSTANTE;}
-#line 1340 "minic.tab.c" /* yacc.c:1646  */
+#line 1348 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 60 "minic.y" /* yacc.c:1646  */
+#line 62 "minic.y" /* yacc.c:1646  */
     {(yyval.codigo)=concatena((yyvsp[-4].codigo), (yyvsp[-1].codigo));}
-#line 1346 "minic.tab.c" /* yacc.c:1646  */
+#line 1354 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 61 "minic.y" /* yacc.c:1646  */
-    {printf("Aplica declarations -> lambda \n");(yyval.codigo)=creaLC();}
-#line 1352 "minic.tab.c" /* yacc.c:1646  */
+#line 63 "minic.y" /* yacc.c:1646  */
+    {(yyval.codigo)=creaLC();}
+#line 1360 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 64 "minic.y" /* yacc.c:1646  */
+#line 66 "minic.y" /* yacc.c:1646  */
     {(yyval.codigo) = (yyvsp[0].codigo);}
-#line 1358 "minic.tab.c" /* yacc.c:1646  */
+#line 1366 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 65 "minic.y" /* yacc.c:1646  */
+#line 67 "minic.y" /* yacc.c:1646  */
     {(yyval.codigo) = concatena((yyvsp[-2].codigo), (yyvsp[0].codigo));}
-#line 1364 "minic.tab.c" /* yacc.c:1646  */
+#line 1372 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 68 "minic.y" /* yacc.c:1646  */
+#line 70 "minic.y" /* yacc.c:1646  */
     {if (!perteneceTablaS((yyvsp[0].cadena))) anadeEntrada((yyvsp[0].cadena),tipo); else printf("Error en línea %d: variable %s ya declarada\n",yylineno,(yyvsp[0].cadena)); (yyval.codigo) = creaLC();}
-#line 1370 "minic.tab.c" /* yacc.c:1646  */
+#line 1378 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 69 "minic.y" /* yacc.c:1646  */
+#line 71 "minic.y" /* yacc.c:1646  */
     {if (!perteneceTablaS((yyvsp[-2].cadena))) anadeEntrada((yyvsp[-2].cadena),tipo); else printf("Error en línea %d: variable %s ya declarada\n",yylineno,(yyvsp[-2].cadena)); (yyval.codigo) = crearLista3((yyvsp[0].codigo), (yyvsp[-2].cadena), "sw");}
-#line 1376 "minic.tab.c" /* yacc.c:1646  */
+#line 1384 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 72 "minic.y" /* yacc.c:1646  */
-    {printf("concatena statement_list\n");(yyval.codigo) = concatena((yyvsp[-1].codigo), (yyvsp[0].codigo));}
-#line 1382 "minic.tab.c" /* yacc.c:1646  */
+#line 74 "minic.y" /* yacc.c:1646  */
+    {(yyval.codigo) = concatena((yyvsp[-1].codigo), (yyvsp[0].codigo));}
+#line 1390 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 73 "minic.y" /* yacc.c:1646  */
-    {(yyval.codigo) = creaLC();printf("Aplica statement_list -> lambda \n");}
-#line 1388 "minic.tab.c" /* yacc.c:1646  */
+#line 75 "minic.y" /* yacc.c:1646  */
+    {(yyval.codigo) = creaLC();}
+#line 1396 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 76 "minic.y" /* yacc.c:1646  */
+#line 78 "minic.y" /* yacc.c:1646  */
     {if (!perteneceTablaS((yyvsp[-3].cadena))) printf("Error en línea %d: variable %s no declarada\n",yylineno,(yyvsp[-3].cadena)); else if (esConstante((yyvsp[-3].cadena))) printf("Error en línea %d: asignación a constante %s\n",yylineno,(yyvsp[-3].cadena)); (yyval.codigo) = crearLista3((yyvsp[-1].codigo), (yyvsp[-3].cadena), "sw");}
-#line 1394 "minic.tab.c" /* yacc.c:1646  */
+#line 1402 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 77 "minic.y" /* yacc.c:1646  */
-    {printf("aplica corchetes\n");(yyval.codigo) = (yyvsp[-1].codigo);}
-#line 1400 "minic.tab.c" /* yacc.c:1646  */
+#line 79 "minic.y" /* yacc.c:1646  */
+    {(yyval.codigo) = (yyvsp[-1].codigo);}
+#line 1408 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 78 "minic.y" /* yacc.c:1646  */
+#line 80 "minic.y" /* yacc.c:1646  */
     {(yyval.codigo) = if_else((yyvsp[-4].codigo), (yyvsp[-2].codigo), (yyvsp[0].codigo));}
-#line 1406 "minic.tab.c" /* yacc.c:1646  */
+#line 1414 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 79 "minic.y" /* yacc.c:1646  */
+#line 81 "minic.y" /* yacc.c:1646  */
     {(yyval.codigo) = listaIf((yyvsp[-2].codigo), (yyvsp[0].codigo));}
-#line 1412 "minic.tab.c" /* yacc.c:1646  */
+#line 1420 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 80 "minic.y" /* yacc.c:1646  */
-    {printf("Aplica while \n");}
-#line 1418 "minic.tab.c" /* yacc.c:1646  */
+#line 82 "minic.y" /* yacc.c:1646  */
+    {(yyval.codigo) = while_((yyvsp[-2].codigo),(yyvsp[0].codigo));}
+#line 1426 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 81 "minic.y" /* yacc.c:1646  */
-    {(yyval.codigo) = (yyvsp[-1].codigo);}
-#line 1424 "minic.tab.c" /* yacc.c:1646  */
+#line 83 "minic.y" /* yacc.c:1646  */
+    {(yyval.codigo) = do_while((yyvsp[-4].codigo),(yyvsp[-1].codigo));}
+#line 1432 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 82 "minic.y" /* yacc.c:1646  */
+#line 84 "minic.y" /* yacc.c:1646  */
     {(yyval.codigo) = (yyvsp[-1].codigo);}
-#line 1430 "minic.tab.c" /* yacc.c:1646  */
+#line 1438 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 22:
 #line 85 "minic.y" /* yacc.c:1646  */
-    {(yyval.codigo) = (yyvsp[0].codigo);}
-#line 1436 "minic.tab.c" /* yacc.c:1646  */
+    {(yyval.codigo) = (yyvsp[-1].codigo);}
+#line 1444 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 86 "minic.y" /* yacc.c:1646  */
-    {printf("concatena print_list\n");(yyval.codigo) = concatena((yyvsp[-2].codigo), (yyvsp[0].codigo));}
-#line 1442 "minic.tab.c" /* yacc.c:1646  */
+#line 88 "minic.y" /* yacc.c:1646  */
+    {(yyval.codigo) = (yyvsp[0].codigo);}
+#line 1450 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
 #line 89 "minic.y" /* yacc.c:1646  */
-    {(yyval.codigo) = listaPrintExpresion((yyvsp[0].codigo));}
-#line 1448 "minic.tab.c" /* yacc.c:1646  */
+    {(yyval.codigo) = concatena((yyvsp[-2].codigo), (yyvsp[0].codigo));}
+#line 1456 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 90 "minic.y" /* yacc.c:1646  */
-    {anadeEntrada((yyvsp[0].cadena),STRING); (yyval.codigo) = listaPrintItem(contCadenas); contCadenas++;}
-#line 1454 "minic.tab.c" /* yacc.c:1646  */
+#line 92 "minic.y" /* yacc.c:1646  */
+    {(yyval.codigo) = listaPrintExpresion((yyvsp[0].codigo));}
+#line 1462 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 26:
 #line 93 "minic.y" /* yacc.c:1646  */
-    {if (!perteneceTablaS((yyvsp[0].cadena))) printf("Error en línea %d: variable %s no declarada\n",yylineno,(yyvsp[0].cadena)); else if (esConstante((yyvsp[0].cadena))) printf("Error en línea %d: asignación a constante %s\n",yylineno,(yyvsp[0].cadena)); (yyval.codigo) = listaRead((yyvsp[0].cadena));}
-#line 1460 "minic.tab.c" /* yacc.c:1646  */
+    {anadeEntrada((yyvsp[0].cadena),STRING); (yyval.codigo) = listaPrintItem(contCadenas); contCadenas++;}
+#line 1468 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 94 "minic.y" /* yacc.c:1646  */
-    {if (!perteneceTablaS((yyvsp[0].cadena))) printf("Error en línea %d: variable %s no declarada\n",yylineno,(yyvsp[0].cadena)); else if (esConstante((yyvsp[0].cadena))) printf("Error en línea %d: asignación a constante %s\n",yylineno,(yyvsp[0].cadena));printf("concatena read_list\n"); (yyval.codigo) = concatena((yyvsp[-2].codigo), listaRead((yyvsp[0].cadena)));}
-#line 1466 "minic.tab.c" /* yacc.c:1646  */
+#line 96 "minic.y" /* yacc.c:1646  */
+    {if (!perteneceTablaS((yyvsp[0].cadena))) printf("Error en línea %d: variable %s no declarada\n",yylineno,(yyvsp[0].cadena)); else if (esConstante((yyvsp[0].cadena))) printf("Error en línea %d: asignación a constante %s\n",yylineno,(yyvsp[0].cadena)); (yyval.codigo) = listaRead((yyvsp[0].cadena));}
+#line 1474 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 28:
 #line 97 "minic.y" /* yacc.c:1646  */
-    {(yyval.codigo) = crearLista2((yyvsp[-2].codigo), (yyvsp[0].codigo), "add");}
-#line 1472 "minic.tab.c" /* yacc.c:1646  */
+    {if (!perteneceTablaS((yyvsp[0].cadena))) printf("Error en línea %d: variable %s no declarada\n",yylineno,(yyvsp[0].cadena)); else if (esConstante((yyvsp[0].cadena))) printf("Error en línea %d: asignación a constante %s\n",yylineno,(yyvsp[0].cadena)); (yyval.codigo) = concatena((yyvsp[-2].codigo), listaRead((yyvsp[0].cadena)));}
+#line 1480 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 98 "minic.y" /* yacc.c:1646  */
-    {(yyval.codigo) = crearLista2((yyvsp[-2].codigo), (yyvsp[0].codigo), "sub");}
-#line 1478 "minic.tab.c" /* yacc.c:1646  */
+#line 100 "minic.y" /* yacc.c:1646  */
+    {(yyval.codigo) = crearLista2((yyvsp[-2].codigo), (yyvsp[0].codigo), "add");}
+#line 1486 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 99 "minic.y" /* yacc.c:1646  */
-    {(yyval.codigo) = crearLista2((yyvsp[-2].codigo), (yyvsp[0].codigo), "mul");}
-#line 1484 "minic.tab.c" /* yacc.c:1646  */
+#line 101 "minic.y" /* yacc.c:1646  */
+    {(yyval.codigo) = crearLista2((yyvsp[-2].codigo), (yyvsp[0].codigo), "sub");}
+#line 1492 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 100 "minic.y" /* yacc.c:1646  */
-    {(yyval.codigo) = crearLista2((yyvsp[-2].codigo), (yyvsp[0].codigo), "div");}
-#line 1490 "minic.tab.c" /* yacc.c:1646  */
+#line 102 "minic.y" /* yacc.c:1646  */
+    {(yyval.codigo) = crearLista2((yyvsp[-2].codigo), (yyvsp[0].codigo), "mul");}
+#line 1498 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 101 "minic.y" /* yacc.c:1646  */
-    {(yyval.codigo) = crearListaNeg((yyvsp[0].codigo), "neg");}
-#line 1496 "minic.tab.c" /* yacc.c:1646  */
+#line 103 "minic.y" /* yacc.c:1646  */
+    {(yyval.codigo) = crearLista2((yyvsp[-2].codigo), (yyvsp[0].codigo), "div");}
+#line 1504 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 102 "minic.y" /* yacc.c:1646  */
-    {(yyval.codigo) = (yyvsp[-1].codigo);}
-#line 1502 "minic.tab.c" /* yacc.c:1646  */
+#line 104 "minic.y" /* yacc.c:1646  */
+    {(yyval.codigo) = crearListaNeg((yyvsp[0].codigo), "neg");}
+#line 1510 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 103 "minic.y" /* yacc.c:1646  */
-    {if (!perteneceTablaS((yyvsp[0].cadena))) printf("Error en línea %d: variable %s no declarada\n",yylineno,(yyvsp[0].cadena));(yyval.codigo) = crearLista((yyvsp[0].cadena), "lw");}
-#line 1508 "minic.tab.c" /* yacc.c:1646  */
+#line 105 "minic.y" /* yacc.c:1646  */
+    {(yyval.codigo) = (yyvsp[-1].codigo);}
+#line 1516 "minic.tab.c" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 104 "minic.y" /* yacc.c:1646  */
+#line 106 "minic.y" /* yacc.c:1646  */
+    {if (!perteneceTablaS((yyvsp[0].cadena))) printf("Error en línea %d: variable %s no declarada\n",yylineno,(yyvsp[0].cadena));(yyval.codigo) = crearLista((yyvsp[0].cadena), "lw");}
+#line 1522 "minic.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 36:
+#line 107 "minic.y" /* yacc.c:1646  */
     {(yyval.codigo) = crearLista((yyvsp[0].cadena), "li");}
-#line 1514 "minic.tab.c" /* yacc.c:1646  */
+#line 1528 "minic.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1518 "minic.tab.c" /* yacc.c:1646  */
+#line 1532 "minic.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1742,7 +1756,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 108 "minic.y" /* yacc.c:1906  */
+#line 111 "minic.y" /* yacc.c:1906  */
 
 
 void yyerror()
@@ -1750,10 +1764,7 @@ void yyerror()
   	printf("Se ha producido un error en esta expresion\n");
 }
 
-ListaC crearLista(char* arg1, char* op)		// esto vale para id y num, solo cambia el tipo de op (li o lw)
-{
-  	printf("crearLista %s\n", op);            //debug
-
+ListaC crearLista(char* arg1, char* op){	// esto vale para id y num, solo cambia el tipo de op (li o lw)
 	ListaC lista = creaLC();
 	char* registro = buscarReg();
 	PosicionListaC inicio = inicioLC(lista);
@@ -1771,14 +1782,10 @@ ListaC crearLista(char* arg1, char* op)		// esto vale para id y num, solo cambia
 	//Insertamos la operación en la lista
 	insertaLC(lista, inicio, operacion);
 	guardaResLC(lista, registro);
-	printf("%s\t%s,%s\n",operacion.op, operacion.res, operacion.arg1);   //debug
-	int i;for (i=0;i<10;i++) printf("[%d]", registros[i]); printf(" %s\n\n", recuperaResLC(lista));    //debug
 	return lista;
 }
 
 ListaC crearLista2(ListaC lista, ListaC arg2, char* op) {
-	printf("crearLista2 %s\n", op);                 //debug
-
 	//recuperamos los registros de las expresiones para la operacion
 	char* regArg1 = recuperaResLC(lista);
 	char* regArg2 = recuperaResLC(arg2);
@@ -1794,20 +1801,16 @@ ListaC crearLista2(ListaC lista, ListaC arg2, char* op) {
 	operacion.res = registro;
 	operacion.arg1 = regArg1;
 	operacion.arg2 = regArg2;
-	printf("%s\t%s,%s,%s\n",operacion.op, operacion.res, operacion.arg1, operacion.arg2);   //debug
 	//liberamos registros
 	liberarReg(regArg1);
 	liberarReg(regArg2);
 	//insertar la op al final de la lista
 	insertaLC(lista, final, operacion);
 	guardaResLC(lista, registro);
-	int i;  for (i=0;i<10;i++) printf("[%d]", registros[i]); printf("\n");    //debug
 	return lista;
 }
 
 ListaC crearLista3(ListaC lista, char* var, char* op) {
-	printf("crearLista3\n");                 //debug
-
 	//recuperamos los registros de las expresiones para la operacion
 	char* regArg = recuperaResLC(lista);
 	PosicionListaC final = finalLC(lista);
@@ -1821,10 +1824,8 @@ ListaC crearLista3(ListaC lista, char* var, char* op) {
 	operacion.arg2 = NULL;  
 	//liberamos registros
 	liberarReg(regArg);
-	printf("%s\t%s,%s\n",operacion.op, operacion.res, operacion.arg1);   //debug
 	// insertar op
 	insertaLC(lista, final, operacion);
-	int i;for (i=0;i<10;i++) printf("[%d]", registros[i]); printf("\n");    //debug
 	return lista;    
 }
 
@@ -1838,15 +1839,12 @@ ListaC crearListaNeg(ListaC lista, char* op){
 	operacion.arg2 = NULL;  
 	//liberamos registros
 	liberarReg(regArg);
-	printf("%s\t%s,%s\n",operacion.op, operacion.res, operacion.arg1);   //debug
 	insertaLC(lista, final, operacion);
 	guardaResLC(lista, regArg);
-	int i;for (i=0;i<10;i++) printf("[%d]", registros[i]); printf("\n");    //debug
 	return lista;
 }
 
 ListaC listaIf(ListaC cond, ListaC st) {
-	printf("listaIf\n");                                //debug
 		//recuperamos los registros de las expresiones
 	char* regCond = recuperaResLC(cond);
 	char* regSt = recuperaResLC(st);
@@ -1877,13 +1875,10 @@ ListaC listaIf(ListaC cond, ListaC st) {
 	etiqueta.arg1 = NULL;
 	etiqueta.arg2 = NULL;
 	insertaLC(cond, final, etiqueta);
-	int i;for (i=0;i<10;i++) printf("[%d]", registros[i]); printf("\n");    //debug
 	return cond;
 }
 
-ListaC if_else(ListaC exp, ListaC stat1, ListaC stat2) {
-	printf("lista IF ELSE\n");                                //debug
-	
+ListaC if_else(ListaC exp, ListaC stat1, ListaC stat2) {	
 	//Obtenemos el registro reg de exp para utilizarlo en el beqz
 	char* reg1 = recuperaResLC(exp);
 	//Creamos la operación beqz y la insertamos en la posición final
@@ -1914,7 +1909,6 @@ ListaC if_else(ListaC exp, ListaC stat1, ListaC stat2) {
 	etiq1.arg1 = NULL;
 	etiq1.arg2 = NULL;
 	insertaLC(exp, finalLC(exp), etiq1);
-	printf("aquí hay un fallo al concatenar, no sé si es por el while o algo\n");				//debug
 	//Concatenamos exp y stat2 (y la liberamos)
 	concatenaLC(exp, stat2);
 	liberaLC(stat2);
@@ -1930,12 +1924,83 @@ ListaC if_else(ListaC exp, ListaC stat1, ListaC stat2) {
 	//Liberamos registros
 	liberarReg(reg1);
 	//Devolvemos la lista
-	int i;for (i=0;i<10;i++) printf("[%d]", registros[i]); printf("\n");    //debug
+	return exp;
+}
+
+ListaC do_while(ListaC stat, ListaC exp){
+	//Insertamos et1 al principio de stat
+	char* et1 = obtenerEtiqueta();
+	char etq1[10];
+	sprintf(etq1, "%s:", et1);
+	Operacion etiq1;
+	etiq1.op = strdup(etq1);
+	etiq1.res = NULL;
+	etiq1.arg1 = NULL;
+	etiq1.arg2 = NULL;
+	insertaLC(stat, inicioLC(stat), etiq1);
+	//Recuperamos reg de exp
+	char* reg = recuperaResLC(exp);
+	//Concatenamos exp y stat (y liberamos stat)
+	concatenaLC(stat, exp);
+	liberaLC(exp);
+	//Insertamos bnez al final de la lista
+	Operacion bnez;
+	bnez.op = "bnez";
+	bnez.res = reg;
+	bnez.arg1 = strdup(etq1);
+	bnez.arg2 = NULL;
+	insertaLC(exp, finalLC(stat), bnez);
+	//Devolvemos la lista
+	return stat;
+}
+
+ListaC while_(ListaC exp, ListaC stat){
+	//Insertamos et1 al principio de exp
+	char* et1 = obtenerEtiqueta();
+	char etq1[10];
+	sprintf(etq1, "%s:", et1);
+	Operacion etiq1;
+	etiq1.op = strdup(etq1);
+	etiq1.res = NULL;
+	etiq1.arg1 = NULL;
+	etiq1.arg2 = NULL;
+	insertaLC(exp, inicioLC(exp), etiq1);
+	//Obtenemos el registro resultado de exp
+	char* reg = recuperaResLC(exp);
+	//Creamos la operación beqz y la insertamos en la posición final
+	char* et2 = obtenerEtiqueta();
+	char etq2[10];
+	sprintf(etq2, "%s:", et2);
+	Operacion beqz;
+	beqz.op = "beqz";
+	beqz.res = reg;
+	beqz.arg1 = strdup(etq2);
+	beqz.arg2 = NULL;
+	insertaLC(exp, finalLC(exp), beqz);
+	//Liberamos el registro
+	liberarReg(reg);
+	//Concatenamos exp y stat (y liberamos stat)
+	concatenaLC(exp, stat);
+	liberaLC(stat);
+	//Creamos la operación b y la insertamos en la posición final
+	Operacion b;
+	b.op = "b";
+	b.arg1 = strdup(etq1);
+	b.arg1 = NULL;
+	b.arg2 = NULL;
+	insertaLC(exp, finalLC(exp), b);
+	//Insertamos et2 al final de exp
+	Operacion etiq2;
+	etiq2.op = strdup(etq2);
+	etiq2.res = NULL;
+	etiq2.arg1 = NULL;
+	etiq2.arg2 = NULL;
+	insertaLC(exp, finalLC(exp), etiq2);
+	//Devolvemos la lista
 	return exp;
 }
 
 ListaC listaPrintItem(int cadena) {
-	printf("listaPrintItem\n");           //debug
 	ListaC lista = creaLC();
 	char str[10];
 	sprintf(str, "$str%d", cadena);
@@ -1962,12 +2027,10 @@ ListaC listaPrintItem(int cadena) {
 	syscall.arg2 = NULL;
 	final = finalLC(lista);
 	insertaLC(lista, final, syscall);
-	int i;for (i=0;i<10;i++) printf("[%d]", registros[i]); printf("\n");    //debug
 	return lista; 
 }
 
 ListaC listaPrintExpresion(ListaC lista) {
-	printf("listaPrintExpresion\n");           //debug
 	char* regLista = recuperaResLC(lista);
 	//move $a0, $tX
 	Operacion op_move;
@@ -1994,21 +2057,18 @@ ListaC listaPrintExpresion(ListaC lista) {
 	syscall.arg2 = NULL;
 	final = finalLC(lista);
 	insertaLC(lista, final, syscall);
-	int i;for (i=0;i<10;i++) printf("[%d]", registros[i]); printf("\n");    //debug
 	return lista;
 }
 
 ListaC concatena(ListaC l1, ListaC l2){
-	printf("concatena\n");           //debug
-	debugLista(l1);
-	debugLista(l2);
+	// debugLista(l1);
+	// debugLista(l2);
 	concatenaLC(l1, l2);
 	liberaLC(l2);
 	return l1;
 }
 
 ListaC listaRead(char* cadena){
-	printf("listaRead\n");           //debug
 	ListaC lista = creaLC();
 	// li $v0, 5
 	Operacion op_li;
@@ -2034,7 +2094,7 @@ ListaC listaRead(char* cadena){
 	op_sw.arg1 = strdup(arg);
 	op_sw.arg2 = NULL;
 	final = finalLC(lista);
-	insertaLC(lista, final, op_sw); 
+	insertaLC(lista, final, op_sw);
 	return lista;
 }
 
@@ -2138,7 +2198,8 @@ ListaC imprimirListaC(ListaC declarations, ListaC statements){
 	// if (inicioLC(lista)==finalLC(lista)) printf("algo va mal...\n");
 	int cont=0;
 	while(aux!=finalLC(declarations)){
-		printf("[%d]\t%s\t%s,%s", cont, recuperaLC(declarations, aux).op, recuperaLC(declarations, aux).res, recuperaLC(declarations, aux).arg1);
+		// printf("[%d]\t", cont);		// DEBUG
+		printf("%s\t%s,%s", recuperaLC(declarations, aux).op, recuperaLC(declarations, aux).res, recuperaLC(declarations, aux).arg1);
 		if (recuperaLC(declarations, aux).arg2!=NULL) printf(",%s\n",recuperaLC(declarations, aux).arg2);
 		else printf("\n");
 		cont++; 
@@ -2150,7 +2211,8 @@ ListaC imprimirListaC(ListaC declarations, ListaC statements){
 	printf("##LongStatements=%d\n",n);
 	// if (inicioLC(lista)==finalLC(lista)) printf("algo va mal...\n");
 	while(aux!=finalLC(statements)){
-		printf("[%d]\t%s", cont, recuperaLC(statements, aux).op);
+		// printf("[%d]\t", cont);		// DEBUG
+		printf("%s", recuperaLC(statements, aux).op);
 		if (recuperaLC(statements, aux).res!=NULL) printf("\t%s",recuperaLC(statements, aux).res);
 		if (recuperaLC(statements, aux).arg1!=NULL) printf(",%s",recuperaLC(statements, aux).arg1);
 		if (recuperaLC(statements, aux).arg2!=NULL) printf(",%s\n",recuperaLC(statements, aux).arg2);
@@ -2158,4 +2220,6 @@ ListaC imprimirListaC(ListaC declarations, ListaC statements){
 		cont++; 
 		aux = siguienteLC(statements, aux);
 	}
+	printf("li\t$v0, 10\nsyscall\n############################\n# Fin de la ejecución ######\n############################\n\n##Regs:");
+	int i;for (i=0;i<10;i++) printf("[%d]", registros[i]); printf("\n");	//debug
 }

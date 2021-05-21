@@ -60,14 +60,15 @@ extern int yydebug;
     CPAR = 270,
     ACOR = 271,
     CCOR = 272,
-    CADENA = 273,
-    ID = 274,
-    NUM = 275,
-    MAS = 276,
-    MENOS = 277,
-    POR = 278,
-    DIV = 279,
-    UMENOS = 280
+    DO = 273,
+    CADENA = 274,
+    ID = 275,
+    NUM = 276,
+    MAS = 277,
+    MENOS = 278,
+    POR = 279,
+    DIV = 280,
+    UMENOS = 281
   };
 #endif
 
@@ -76,12 +77,12 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 40 "minic.y" /* yacc.c:1909  */
+#line 42 "minic.y" /* yacc.c:1909  */
 
 char *cadena;
 ListaC codigo;
 
-#line 85 "minic.tab.h" /* yacc.c:1909  */
+#line 86 "minic.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
