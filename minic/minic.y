@@ -5,6 +5,10 @@
 #include <string.h>
 #include <assert.h>
 
+extern int numero_errores;
+int error_sem = 0;
+int error_sin = 0;
+
 Lista tablaSimb;
 int contCadenas=0;
 Tipo tipo;
@@ -12,7 +16,7 @@ int perteneceTablaS(char *lexema);
 void anadeEntrada(char *lexema, Tipo tipo);
 int esConstante(char *lexema);
 void imprimirTablaS();
-ListaC imprimirListaC(ListaC declarations, ListaC statements);
+void imprimirListaC(ListaC declarations, ListaC statements);
 
 char* buscarReg();
 ListaC crearLista(char* arg1, char* op);
@@ -56,7 +60,7 @@ ListaC codigo;
 
 %%
 
-program : {tablaSimb=creaLS();} VOID ID APAR CPAR ACOR declarations statement_list CCOR	{imprimirTablaS(); liberaLS(tablaSimb); imprimirListaC($7, $8);}
+program : {tablaSimb=creaLS();} VOID ID APAR CPAR ACOR declarations statement_list CCOR	{if (numero_errores==0 && error_sem==0 && error_sin ==0) {imprimirTablaS();imprimirListaC($7, $8);} else printf("Errores léxicos: %d\nErrores semánticos: %d\nErrores sintácticos: %d\n",numero_errores,error_sem,error_sin); liberaLS(tablaSimb);}
         ;
 
 declarations : declarations VAR {tipo=VARIABLE;} identifier_list SEMICOLON			{$$=concatena($1, $4);}
@@ -68,15 +72,15 @@ identifier_list : asig							{$$ = $1;}
                 | identifier_list COMA asig		{$$ = concatena($1, $3);}
                 ;
 
-asig : ID			                  	{if (!perteneceTablaS($1)) anadeEntrada($1,tipo); else printf("Error en línea %d: variable %s ya declarada\n",yylineno,$1); $$ = creaLC();}
-     | ID IGUAL expression	    		{if (!perteneceTablaS($1)) anadeEntrada($1,tipo); else printf("Error en línea %d: variable %s ya declarada\n",yylineno,$1); $$ = crearLista3($3, $1, "sw");}
+asig : ID			                  	{if (!perteneceTablaS($1)) anadeEntrada($1,tipo); else {printf("Error en línea %d: variable %s ya declarada\n",yylineno,$1);error_sin++;}; $$ = creaLC();}
+     | ID IGUAL expression	    		{if (!perteneceTablaS($1)) anadeEntrada($1,tipo); else {printf("Error en línea %d: variable %s ya declarada\n",yylineno,$1);error_sin++;} $$ = crearLista3($3, $1, "sw");}
      ;
 
 statement_list : statement_list statement		{$$ = concatena($1, $2);}
                | /*empty*/						{$$ = creaLC();}
                ;
 
-statement : ID IGUAL expression SEMICOLON				{if (!perteneceTablaS($1)) printf("Error en línea %d: variable %s no declarada\n",yylineno,$1); else if (esConstante($1)) printf("Error en línea %d: asignación a constante %s\n",yylineno,$1); $$ = crearLista3($3, $1, "sw");}
+statement : ID IGUAL expression SEMICOLON				{if (!perteneceTablaS($1)) {printf("Error en línea %d: variable %s no declarada\n",yylineno,$1);error_sin++;} else if (esConstante($1)) {printf("Error en línea %d: asignación a constante %s\n",yylineno,$1);error_sin++;} $$ = crearLista3($3, $1, "sw");}
           | ACOR statement_list CCOR					{$$ = $2;}
           | IF APAR expression CPAR statement ELSE statement	{$$ = if_else($3, $5, $7);}
           | IF APAR expression CPAR statement   		{$$ = listaIf($3, $5);}
@@ -94,18 +98,18 @@ print_item : expression              		{$$ = listaPrintExpresion($1);}
            | CADENA		               		{if (!perteneceTablaS($1)) anadeEntrada($1,STRING); $$ = listaPrintItem($1);}
            ;
 
-read_list : ID				             	{if (!perteneceTablaS($1)) printf("Error en línea %d: variable %s no declarada\n",yylineno,$1); else if (esConstante($1)) printf("Error en línea %d: asignación a constante %s\n",yylineno,$1); $$ = listaRead($1);}
-          | read_list COMA ID		    	{if (!perteneceTablaS($3)) printf("Error en línea %d: variable %s no declarada\n",yylineno,$3); else if (esConstante($3)) printf("Error en línea %d: asignación a constante %s\n",yylineno,$3); $$ = concatena($1, listaRead($3));}
+read_list : ID				             	{if (!perteneceTablaS($1)) {printf("Error en línea %d: variable %s no declarada\n",yylineno,$1);error_sin++;} else if (esConstante($1)) {printf("Error en línea %d: asignación a constante %s\n",yylineno,$1);error_sin++;} $$ = listaRead($1);}
+          | read_list COMA ID		    	{if (!perteneceTablaS($3)) {printf("Error en línea %d: variable %s no declarada\n",yylineno,$3);error_sin++;} else if (esConstante($3)) {printf("Error en línea %d: asignación a constante %s\n",yylineno,$3);error_sin++;} $$ = concatena($1, listaRead($3));}
           ;
 
 expression : expression MAS expression	  	  {$$ = crearLista2($1, $3, "add");}
-           | expression MENOS expression	  {$$ = crearLista2($1, $3, "sub");}
+           | expression MENOS expression	  	  {$$ = crearLista2($1, $3, "sub");}
            | expression POR expression		  {$$ = crearLista2($1, $3, "mul");}
            | expression DIV expression		  {$$ = crearLista2($1, $3, "div");}
            | MENOS expression %prec UMENOS	  {$$ = crearListaNeg($2, "neg");}
-           | APAR expression CPAR		  	    {$$ = $2;}	// como la expresion ya es una listaC, no hace falta crear otra listaC
-           | ID								    {if (!perteneceTablaS($1)) printf("Error en línea %d: variable %s no declarada\n",yylineno,$1);$$ = crearLista($1, "lw");}
-           | NUM							    {$$ = crearLista($1, "li");}          	
+           | APAR expression CPAR		  {$$ = $2;}	// como la expresion ya es una listaC, no hace falta crear otra listaC
+           | ID					  {if (!perteneceTablaS($1)) {printf("Error en línea %d: variable %s no declarada\n",yylineno,$1);error_sin++;} $$ = crearLista($1, "lw");}
+           | NUM				  {$$ = crearLista($1, "li");}          	
 		   										
            ;
 
@@ -114,6 +118,7 @@ expression : expression MAS expression	  	  {$$ = crearLista2($1, $3, "add");}
 void yyerror()
 {
   	printf("Se ha producido un error en esta expresion\n");
+  	error_sem++;
 }
 
 ListaC crearLista(char* arg1, char* op){	// esto vale para id y num, solo cambia el tipo de op (li o lw)
@@ -550,7 +555,7 @@ void imprimirTablaS()
 }
 
 
-ListaC imprimirListaC(ListaC declarations, ListaC statements){
+void imprimirListaC(ListaC declarations, ListaC statements){
 	printf("\n############################\n# Seccion de codigo\n.text\n.globl main\n\nmain:\n");
 	//recorrer declarations
 	PosicionListaC aux = inicioLC(declarations);
