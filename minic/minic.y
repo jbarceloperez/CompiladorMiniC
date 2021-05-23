@@ -23,7 +23,7 @@ ListaC listaIf(ListaC cond, ListaC st);
 ListaC if_else(ListaC exp, ListaC stat1, ListaC stat2);
 ListaC while_(ListaC exp, ListaC stat);
 ListaC do_while(ListaC stat, ListaC exp);
-ListaC listaPrintItem(int cadena);
+ListaC listaPrintItem(char* cadena);
 ListaC listaPrintExpresion(ListaC arg);
 ListaC concatena(ListaC l1, ListaC l2);
 ListaC listaRead(char* cadena);
@@ -91,7 +91,7 @@ print_list : print_item                         {$$ = $1;}
            ;
 
 print_item : expression              		{$$ = listaPrintExpresion($1);}
-           | CADENA		               		{anadeEntrada($1,STRING); $$ = listaPrintItem(contCadenas); contCadenas++;}
+           | CADENA		               		{if (!perteneceTablaS($1)) anadeEntrada($1,STRING); $$ = listaPrintItem($1);}
            ;
 
 read_list : ID				             	{if (!perteneceTablaS($1)) printf("Error en línea %d: variable %s no declarada\n",yylineno,$1); else if (esConstante($1)) printf("Error en línea %d: asignación a constante %s\n",yylineno,$1); $$ = listaRead($1);}
@@ -248,7 +248,7 @@ ListaC if_else(ListaC exp, ListaC stat1, ListaC stat2) {
 	char* et2 = obtenerEtiqueta();
 	Operacion b;
 	b.op = "b";
-	b.res = strdup(et2);
+	b.res = et2;
 	b.arg1 = NULL;
 	b.arg2 = NULL;
 	insertaLC(exp, finalLC(exp), b);
@@ -321,6 +321,8 @@ ListaC while_(ListaC exp, ListaC stat){
 	char* reg = recuperaResLC(exp);
 	//Creamos la operación beqz y la insertamos en la posición final
 	char* et2 = obtenerEtiqueta();
+	char etq2[10];
+	sprintf(etq2, "%s:", et2);
 	Operacion beqz;
 	beqz.op = "beqz";
 	beqz.res = reg;
@@ -340,8 +342,6 @@ ListaC while_(ListaC exp, ListaC stat){
 	b.arg2 = NULL;
 	insertaLC(exp, finalLC(exp), b);
 	//Insertamos et2 al final de exp
-	char etq2[10];
-	sprintf(etq2, "%s:", et2);
 	Operacion etiq2;
 	etiq2.op = strdup(etq2);
 	etiq2.res = NULL;
@@ -352,10 +352,15 @@ ListaC while_(ListaC exp, ListaC stat){
 	return exp;
 }
 
-ListaC listaPrintItem(int cadena) {
+ListaC listaPrintItem(char* cadena) {
 	ListaC lista = creaLC();
+	
+	//Buscamos la cadena
+	PosicionLista posicion = buscaLS(tablaSimb, cadena);
+	Simbolo simbolo = recuperaLS(tablaSimb, posicion);
+	
 	char str[10];
-	sprintf(str, "$str%d", cadena);
+	sprintf(str, "$str%d", simbolo.valor);
 	// añadir el la $a0, $strX
 	Operacion op_la;
 	op_la.op = "la";
@@ -490,7 +495,7 @@ void liberarReg(char* registro) {
 //Métodos para traducir sentencias
 char *obtenerEtiqueta() {
   char aux[32];
-  sprintf(aux, "ET%d", tag_counter++);
+  sprintf(aux, "$l%d", tag_counter++);
   return strdup(aux);
 }
 
@@ -506,7 +511,11 @@ void anadeEntrada(char *lexema, Tipo tipo)
 	Simbolo simbolo;
 	simbolo.nombre = lexema;
 	simbolo.tipo = tipo;
-	if (tipo == STRING) simbolo.valor = contCadenas;
+	if (tipo == STRING) 
+	{
+		simbolo.valor = contCadenas;
+		contCadenas++;
+	}
 	else simbolo.valor = 0;
 	insertaLS(tablaSimb, final, simbolo);
 }
@@ -551,8 +560,8 @@ ListaC imprimirListaC(ListaC declarations, ListaC statements){
 	int cont=0;
 	while(aux!=finalLC(declarations)){
 		// printf("[%d]\t", cont);		// DEBUG
-		printf("%s\t%s,%s", recuperaLC(declarations, aux).op, recuperaLC(declarations, aux).res, recuperaLC(declarations, aux).arg1);
-		if (recuperaLC(declarations, aux).arg2!=NULL) printf(",%s\n",recuperaLC(declarations, aux).arg2);
+		printf("%s\t%s, %s", recuperaLC(declarations, aux).op, recuperaLC(declarations, aux).res, recuperaLC(declarations, aux).arg1);
+		if (recuperaLC(declarations, aux).arg2!=NULL) printf(", %s\n",recuperaLC(declarations, aux).arg2);
 		else printf("\n");
 		cont++; 
 		aux = siguienteLC(declarations, aux);
@@ -566,8 +575,8 @@ ListaC imprimirListaC(ListaC declarations, ListaC statements){
 		// printf("[%d]\t", cont);		// DEBUG
 		printf("%s", recuperaLC(statements, aux).op);
 		if (recuperaLC(statements, aux).res!=NULL) printf("\t%s",recuperaLC(statements, aux).res);
-		if (recuperaLC(statements, aux).arg1!=NULL) printf(",%s",recuperaLC(statements, aux).arg1);
-		if (recuperaLC(statements, aux).arg2!=NULL) printf(",%s\n",recuperaLC(statements, aux).arg2);
+		if (recuperaLC(statements, aux).arg1!=NULL) printf(", %s",recuperaLC(statements, aux).arg1);
+		if (recuperaLC(statements, aux).arg2!=NULL) printf(", %s\n",recuperaLC(statements, aux).arg2);
 		else printf("\n");
 		cont++; 
 		aux = siguienteLC(statements, aux);
