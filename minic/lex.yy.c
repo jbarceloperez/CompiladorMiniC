@@ -2056,7 +2056,6 @@ int comprobacion_id()
 	printf("ERROR: identificador demasiado largo en linea %d: %s\n",yylineno,yytext);
 	numero_errores++;
   }
-  //yylval.cadena=strdup(yytext);
 }
 
 int comprobacion_numero()
@@ -2065,15 +2064,5 @@ int comprobacion_numero()
 	printf("ERROR: entero demasiado grande en linea %d: %s\n",yylineno,yytext);
 	numero_errores++;
   }
-  //yylval.cadena=strdup(yytext);
 }
-
-/* void main() {
-    int i;
-    while (i=yylex())
-        printf("%d %s %d\n",i,yytext,yyleng);
-    printf("FIN DE ANALISIS LEXICO\n");
-    printf("----------------------\n");
-    printf("Errores lexicos: %d\n",numero_errores);
-} */
 

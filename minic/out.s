@@ -22,7 +22,7 @@ _d:	.word 0
 .globl main
 
 main:
-##LongDeclarations=12
+##Declarations
 li	$t0, 0
 sw	$t0, _a
 li	$t0, 0
@@ -35,7 +35,7 @@ sub	$t1, $t2, $t0
 sw	$t1, _c
 li	$t0, 0
 sw	$t0, _d
-##LongStatements=68
+##Statements
 la	$a0, $str0
 li	$v0, 4
 syscall
