@@ -5,13 +5,13 @@
 void prueba() {
     // Declaraciones
     const a=0, b=0;
-    var c=5+20-20, d;
+    var c=5+2-2;
     // Sentencias
     print "Inicio del programa\n";
-    read d;
     if (a) print "a","\n";
     else if (b) print "No a y b\n";
-         else while (c) {
+         else while (c) 
+         {
              print "c =",c,"\n";
              c = c-2+1;
          }

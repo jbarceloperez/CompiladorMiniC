@@ -3,6 +3,7 @@
 #include "listaSimbolos.h"
 #include "listaCodigo.h"
 #include <string.h>
+#include <assert.h>
 
 Lista tablaSimb;
 int contCadenas=0;
@@ -298,7 +299,7 @@ ListaC do_while(ListaC stat, ListaC exp){
 	Operacion bnez;
 	bnez.op = "bnez";
 	bnez.res = reg;
-	bnez.arg1 = strdup(etq1);
+	bnez.arg1 = et1;
 	bnez.arg2 = NULL;
 	insertaLC(exp, finalLC(stat), bnez);
 	//Devolvemos la lista
@@ -471,7 +472,7 @@ char* buscarReg()
 {
 	int i = 0;
 	while (registros[i] != 0) i++;
-
+	assert(i < 10);		// si i llega a 10 o más, es porque nos hemos quedado sin registros, se aborta la ejecución.
 	registros[i] = 1;
 	char registro[4];
 	sprintf(registro, "$t%d", i);
