@@ -5,7 +5,7 @@
 void prueba() {
     // Declaraciones
     const a=0, b=0;
-    var c=5+2-2;
+    var c=5+2-2, d=0;
     // Sentencias
     print "Inicio del programa\n";
     if (a) print "a","\n";
@@ -15,5 +15,9 @@ void prueba() {
              print "c =",c,"\n";
              c = c-2+1;
          }
-    print "Final","\n";
+    do {
+        print "d =",d,"\n";
+        d = d+1;}
+    while (d-5)
+    print "Final","\n";    
 }

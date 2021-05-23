@@ -60,34 +60,34 @@ ListaC codigo;
 
 %%
 
-program : {tablaSimb=creaLS();} VOID ID APAR CPAR ACOR declarations statement_list CCOR	{if (numero_errores==0 && error_sem==0 && error_sin ==0) {imprimirTablaS();imprimirListaC($7, $8);} else printf("Errores léxicos: %d\nErrores semánticos: %d\nErrores sintácticos: %d\n",numero_errores,error_sem,error_sin); liberaLS(tablaSimb);}
+program : {tablaSimb=creaLS();} VOID ID APAR CPAR ACOR declarations statement_list CCOR		{if (numero_errores==0 && error_sem==0 && error_sin ==0) {imprimirTablaS();imprimirListaC($7, $8);} else printf("----------------------\nErrores léxicos: %d\nErrores semánticos: %d\nErrores sintácticos: %d\n",numero_errores,error_sem,error_sin); liberaLS(tablaSimb); liberaLC($7); liberaLC($8);}
         ;
 
-declarations : declarations VAR {tipo=VARIABLE;} identifier_list SEMICOLON			{$$=concatena($1, $4);}
-             | declarations CONST {tipo=CONSTANTE;} identifier_list SEMICOLON		{$$=concatena($1, $4);}
-             | /*empty*/			{$$=creaLC();}
+declarations : declarations VAR {tipo=VARIABLE;} identifier_list SEMICOLON	{$$=concatena($1, $4);}
+             | declarations CONST {tipo=CONSTANTE;} identifier_list SEMICOLON	{$$=concatena($1, $4);}
+             | /*empty*/							{$$=creaLC();}
              ;
 
-identifier_list : asig							{$$ = $1;}
+identifier_list : asig					{$$ = $1;}
                 | identifier_list COMA asig		{$$ = concatena($1, $3);}
                 ;
 
-asig : ID			                  	{if (!perteneceTablaS($1)) anadeEntrada($1,tipo); else {printf("Error en línea %d: variable %s ya declarada\n",yylineno,$1);error_sin++;}; $$ = creaLC();}
-     | ID IGUAL expression	    		{if (!perteneceTablaS($1)) anadeEntrada($1,tipo); else {printf("Error en línea %d: variable %s ya declarada\n",yylineno,$1);error_sin++;} $$ = crearLista3($3, $1, "sw");}
+asig : ID			        {if (!perteneceTablaS($1)) anadeEntrada($1,tipo); else {printf("Error en línea %d: variable %s ya declarada\n",yylineno,$1);error_sin++;}; $$ = creaLC();}
+     | ID IGUAL expression	    	{if (!perteneceTablaS($1)) anadeEntrada($1,tipo); else {printf("Error en línea %d: variable %s ya declarada\n",yylineno,$1);error_sin++;} $$ = crearLista3($3, $1, "sw");}
      ;
 
-statement_list : statement_list statement		{$$ = concatena($1, $2);}
-               | /*empty*/						{$$ = creaLC();}
+statement_list : statement_list statement	{$$ = concatena($1, $2);}
+               | /*empty*/			{$$ = creaLC();}
                ;
 
 statement : ID IGUAL expression SEMICOLON				{if (!perteneceTablaS($1)) {printf("Error en línea %d: variable %s no declarada\n",yylineno,$1);error_sin++;} else if (esConstante($1)) {printf("Error en línea %d: asignación a constante %s\n",yylineno,$1);error_sin++;} $$ = crearLista3($3, $1, "sw");}
           | ACOR statement_list CCOR					{$$ = $2;}
-          | IF APAR expression CPAR statement ELSE statement	{$$ = if_else($3, $5, $7);}
-          | IF APAR expression CPAR statement   		{$$ = listaIf($3, $5);}
-          | WHILE APAR expression CPAR statement		{$$ = while_($3,$5);}
-          | DO statement WHILE APAR expression CPAR		{$$ = do_while($2,$5);}
-          | PRINT print_list SEMICOLON          		{$$ = $2;}
-          | READ read_list SEMICOLON            		{$$ = $2;}
+          | IF APAR expression CPAR statement ELSE statement		{$$ = if_else($3, $5, $7);}
+          | IF APAR expression CPAR statement   				{$$ = listaIf($3, $5);}
+          | WHILE APAR expression CPAR statement				{$$ = while_($3,$5);}
+          | DO statement WHILE APAR expression CPAR			{$$ = do_while($2,$5);}
+          | PRINT print_list SEMICOLON          				{$$ = $2;}
+          | READ read_list SEMICOLON            				{$$ = $2;}
           ;
 
 print_list : print_item                         {$$ = $1;}
@@ -95,11 +95,11 @@ print_list : print_item                         {$$ = $1;}
            ;
 
 print_item : expression              		{$$ = listaPrintExpresion($1);}
-           | CADENA		               		{if (!perteneceTablaS($1)) anadeEntrada($1,STRING); $$ = listaPrintItem($1);}
+           | CADENA		               	{if (!perteneceTablaS($1)) anadeEntrada($1,STRING); $$ = listaPrintItem($1);}
            ;
 
 read_list : ID				             	{if (!perteneceTablaS($1)) {printf("Error en línea %d: variable %s no declarada\n",yylineno,$1);error_sin++;} else if (esConstante($1)) {printf("Error en línea %d: asignación a constante %s\n",yylineno,$1);error_sin++;} $$ = listaRead($1);}
-          | read_list COMA ID		    	{if (!perteneceTablaS($3)) {printf("Error en línea %d: variable %s no declarada\n",yylineno,$3);error_sin++;} else if (esConstante($3)) {printf("Error en línea %d: asignación a constante %s\n",yylineno,$3);error_sin++;} $$ = concatena($1, listaRead($3));}
+          | read_list COMA ID		    		{if (!perteneceTablaS($3)) {printf("Error en línea %d: variable %s no declarada\n",yylineno,$3);error_sin++;} else if (esConstante($3)) {printf("Error en línea %d: asignación a constante %s\n",yylineno,$3);error_sin++;} $$ = concatena($1, listaRead($3));}
           ;
 
 expression : expression MAS expression	  	  {$$ = crearLista2($1, $3, "add");}
@@ -307,6 +307,8 @@ ListaC do_while(ListaC stat, ListaC exp){
 	bnez.arg1 = et1;
 	bnez.arg2 = NULL;
 	insertaLC(exp, finalLC(stat), bnez);
+	//Liberamos el registro
+	liberarReg(reg);
 	//Devolvemos la lista
 	return stat;
 }
@@ -559,8 +561,7 @@ void imprimirListaC(ListaC declarations, ListaC statements){
 	printf("\n############################\n# Seccion de codigo\n.text\n.globl main\n\nmain:\n");
 	//recorrer declarations
 	PosicionListaC aux = inicioLC(declarations);
-	int n = longitudLC(declarations);
-	printf("##LongDeclarations=%d\n",n);
+	printf("##Declarations\n");
 	// if (inicioLC(lista)==finalLC(lista)) printf("algo va mal...\n");
 	int cont=0;
 	while(aux!=finalLC(declarations)){
@@ -573,8 +574,7 @@ void imprimirListaC(ListaC declarations, ListaC statements){
 	}
 	//recorrer statements
 	aux = inicioLC(statements);
-	n = longitudLC(statements);
-	printf("##LongStatements=%d\n",n);
+	printf("##Statements\n");
 	// if (inicioLC(lista)==finalLC(lista)) printf("algo va mal...\n");
 	while(aux!=finalLC(statements)){
 		// printf("[%d]\t", cont);		// DEBUG
@@ -586,6 +586,5 @@ void imprimirListaC(ListaC declarations, ListaC statements){
 		cont++; 
 		aux = siguienteLC(statements, aux);
 	}
-	printf("li\t$v0, 10\nsyscall\n############################\n# Fin de la ejecución ######\n############################\n\n##Regs:");
-	int i;for (i=0;i<10;i++) printf("[%d]", registros[i]); printf("\n");	//debug
+	printf("li\t$v0, 10\nsyscall\n############################\n# Fin de la ejecución ######\n############################\n\n");
 }
