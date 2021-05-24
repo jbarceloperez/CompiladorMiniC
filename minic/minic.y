@@ -537,7 +537,7 @@ int esConstante(char *lexema)
 void imprimirTablaS()
 {
 	PosicionLista posicion = inicioLS(tablaSimb);
-	printf("############################\n");
+	printf("\n############################\n");
 	printf(".data\n\n");
 	printf("# STRINGS ##################\n");
 	while (posicion != finalLS(tablaSimb))
